@@ -1,1 +1,1 @@
-print ("Wiadomosc testowa 23")
+print ("Wiadomosc testowa 24")
