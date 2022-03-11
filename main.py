@@ -1,0 +1,1 @@
+print ("Wiadomosc testowa 23")
