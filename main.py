@@ -15,6 +15,9 @@ currentY = where0[1]
 varX = 0
 varY = 0
 
+# Global search stopper
+proceed = True
+
 # Function to swap blank space with another in table
 def swapper(x1, y1, x2, y2): #Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
     temporary = problem_board[x1, y1]
@@ -31,11 +34,13 @@ def dfs(array, origin, brake):
     global currentY
     global varX
     global varY
+    global proceed
     if np.array_equal(array, final_board):
         print("is equal")
         print(array)
+        proceed = False
         return
-    else:
+    elif proceed:
         print("is not equal")
         print(array)
         print()
