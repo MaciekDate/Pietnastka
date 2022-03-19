@@ -1,15 +1,16 @@
 import numpy as np
 
+# Maximum depth of recursion
+depth = 10
+
 # Boards
 final_board = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]])
 problem_board = np.loadtxt("puzzle.txt", skiprows=1, dtype=int)
 
-# Maximum depth of recursion
-depth = 10
-
-# Blank space coords
-currentX = 3
-currentY = 2
+# Find where are the blank space coords
+where0 = np.where(problem_board == 0)
+currentX = where0[0]
+currentY = where0[1]
 
 varX = 0
 varY = 0
@@ -71,6 +72,10 @@ if __name__ == '__main__':
 
     print("\nCurrent board:")
     print(problem_board)
+
+    print("\nCurrent position of blank space(X/Y):")
+    print(currentX)
+    print(currentY)
 
     print("\nAlgorythm start:")
     dfs(problem_board, 'N', 0)
