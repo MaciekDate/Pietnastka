@@ -2,7 +2,7 @@ import numpy as np
 import time
 
 # Maximum depth of recursion
-depth = 20
+depth = 10
 
 # Boards
 final_board = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]])
@@ -18,6 +18,9 @@ varY = 0
 
 # Global search stopper
 proceed = True
+
+# Path string
+path = "X"
 
 # Function to swap blank space with another in table
 def swapper(x1, y1, x2, y2): #Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
@@ -36,6 +39,7 @@ def dfs(array, origin, brake):
     global varX
     global varY
     global proceed
+    global path
     if np.array_equal(array, final_board):
         print("is equal")
         print(array)
@@ -52,22 +56,34 @@ def dfs(array, origin, brake):
 
         if  origin != 'L' and currentY + 1 <= 3:#ADD SPECIFIC VALUE READ FROM FILE!!!
             swapper(currentX, currentY, currentX, currentY + 1)
+            path = path + "R"
             dfs(array, 'R', brake + 1)
+            if proceed:
+                path = path[:-1]
             swapper(currentX, currentY, currentX, currentY - 1)
 
-        if origin != 'R' and currentY - 1 >= 0 :
+        if  proceed and origin != 'R' and currentY - 1 >= 0 :
             swapper(currentX, currentY, currentX, currentY - 1)
+            path = path + "L"
             dfs(array, 'L', brake + 1)
+            if proceed:
+                path = path[:-1]
             swapper(currentX, currentY, currentX, currentY + 1)
 
-        if origin != 'U' and currentX + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+        if  proceed and origin != 'U' and currentX + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
             swapper(currentX, currentY, currentX + 1, currentY)
+            path = path + "D"
             dfs(array, 'D', brake + 1)
+            if proceed:
+                path = path[:-1]
             swapper(currentX, currentY, currentX - 1, currentY)
 
-        if origin != 'D' and currentX - 1 >= 0:
+        if  proceed and origin != 'D' and currentX - 1 >= 0:
             swapper(currentX, currentY, currentX - 1, currentY)
+            path = path + "U"
             dfs(array, 'U', brake + 1)
+            if proceed:
+                path = path[:-1]
             swapper(currentX, currentY, currentX + 1, currentY)
 
 
@@ -88,5 +104,6 @@ if __name__ == '__main__':
 
     print("\nAlgorythm start:")
     dfs(problem_board, 'N', 0)
+    print(path)
 
     print("--- It took: %s seconds ---" % (time.time() - start_time))
