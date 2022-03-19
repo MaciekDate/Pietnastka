@@ -1,7 +1,8 @@
 import numpy as np
+import time
 
 # Maximum depth of recursion
-depth = 10
+depth = 20
 
 # Boards
 final_board = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]])
@@ -82,5 +83,10 @@ if __name__ == '__main__':
     print(currentX)
     print(currentY)
 
+    # Count runtime of an algorythm
+    start_time = time.time()
+
     print("\nAlgorythm start:")
     dfs(problem_board, 'N', 0)
+
+    print("--- It took: %s seconds ---" % (time.time() - start_time))
