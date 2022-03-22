@@ -1,6 +1,5 @@
 import numpy as np
 import time
-import sys
 
 # Default launch options
 algo = "bfs"
@@ -24,8 +23,10 @@ where0 = np.where(problem_board == 0)
 currentX = where0[0]
 currentY = where0[1]
 
-varX = 0
-varY = 0
+# BFS queues
+queue = []
+pathQueue = []
+safeValve = 0
 
 # Global search stopper
 proceed = True
@@ -49,8 +50,6 @@ def swapper(x1, y1, x2, y2):  # Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
 def dfs(array, origin, brake):
     global currentX
     global currentY
-    global varX
-    global varY
     global proceed
     global path
     global order
@@ -105,6 +104,68 @@ def dfs(array, origin, brake):
                         path = path[:-1]
                     swapper(currentX, currentY, currentX + 1, currentY)
 
+# Function to swap blank space with another in table
+def swapper2_0(x, y, array): #Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
+    whereis0 = np.where(array == 0)
+    currentx = whereis0[0]
+    currenty = whereis0[1]
+    temporary = array[currentx, currenty]
+    array[currentx, currenty] = array[currentx + x, currenty + y]
+    array[currentx + x, currenty + y] = temporary
+
+
+# Breadth first search
+def bfs(array, origin):
+    whereisE0 = np.where(array == 0)
+    currentEX = whereisE0[0]
+    currentEY = whereisE0[1]
+    global proceed
+    global queue
+    global path
+    global safeValve
+    if np.array_equal(array, final_board):
+        print("is equal")
+        print(queue[0])
+        queue.pop(0)
+        pathQueue.pop(0)
+        proceed = False
+        return
+    elif proceed and safeValve < 5000:
+        print("is not equal")
+        print(array)
+        print()
+        queue.pop(0)
+        pathQueue.pop(0)
+        if origin != 'L' and currentEY + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+            swapper2_0(0, 1, array)
+            #path = path + "R"
+            queue.append(np.array(array))
+            pathQueue.append("R")
+            swapper2_0(0, -1, array)
+
+        if proceed and origin != 'R' and currentEY - 1 >= 0:
+            swapper2_0(0, -1, array)
+            #path = path + "L"
+            queue.append(np.array(array))
+            pathQueue.append("L")
+            swapper2_0(0, 1, array)
+
+        if proceed and origin != 'U' and currentEX + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+            swapper2_0(1, 0, array)
+            #path = path + "D"
+            queue.append(np.array(array))
+            pathQueue.append("D")
+            swapper2_0(-1, 0, array)
+
+        if proceed and origin != 'D' and currentEX - 1 >= 0:
+            swapper2_0(-1, 0, array)
+            #path = path + "U"
+            queue.append(np.array(array))
+            pathQueue.append("U")
+            swapper2_0(1, 0, array)
+        safeValve += 1
+        bfs(queue[0], pathQueue[0])
+
 
 # Main function
 if __name__ == '__main__':
@@ -120,10 +181,14 @@ if __name__ == '__main__':
 
     # Count runtime of an algorithm
     start_time = time.time()
-
+    queue.append(problem_board)
+    pathQueue.append("X")
     print("\nAlgorithm start:")
-    dfs(problem_board, 'N', 0)
-    print(path)
+    bfs(problem_board, 'N')
+    print(queue)
+    print(len(queue))
+    queue.clear()
+    print(queue)
 
     # Options (CMD)
     # print("\nAlgorithm: ", algo)
