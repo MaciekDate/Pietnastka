@@ -3,7 +3,7 @@ import time
 
 # Default launch options
 algo = "bfs"
-order = "RLDU"
+order = "LRDU"
 file = "puzzle.txt"
 
 # Launch options (CMD)
@@ -27,6 +27,7 @@ currentY = where0[1]
 queue = []
 pathQueue = []
 safeValve = 0
+truePath = 'X'
 
 # Global search stopper
 proceed = True
@@ -123,11 +124,12 @@ def bfs(array, origin):
     global queue
     global path
     global safeValve
+    global truePath
     if np.array_equal(array, final_board):
         print("is equal")
         print(queue[0])
         queue.pop(0)
-        pathQueue.pop(0)
+        truePath = pathQueue.pop(0)
         proceed = False
         return
     elif proceed and safeValve < 5000:
@@ -136,32 +138,39 @@ def bfs(array, origin):
         print()
         queue.pop(0)
         pathQueue.pop(0)
-        if origin != 'L' and currentEY + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+        if origin[-1] != 'L' and currentEY + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
             swapper2_0(0, 1, array)
-            #path = path + "R"
             queue.append(np.array(array))
-            pathQueue.append("R")
+            originR = origin + "R"
+            pathQueue.append(originR)
+            #pathQueue.append("R")
             swapper2_0(0, -1, array)
 
-        if proceed and origin != 'R' and currentEY - 1 >= 0:
+        if proceed and origin[-1] != 'R' and currentEY - 1 >= 0:
             swapper2_0(0, -1, array)
             #path = path + "L"
             queue.append(np.array(array))
-            pathQueue.append("L")
+            originL = origin + "L"
+            pathQueue.append(originL)
+            #pathQueue.append("L")
             swapper2_0(0, 1, array)
 
-        if proceed and origin != 'U' and currentEX + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+        if proceed and origin[-1] != 'U' and currentEX + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
             swapper2_0(1, 0, array)
             #path = path + "D"
             queue.append(np.array(array))
-            pathQueue.append("D")
+            originD = origin + "D"
+            pathQueue.append(originD)
+            #pathQueue.append("D")
             swapper2_0(-1, 0, array)
 
-        if proceed and origin != 'D' and currentEX - 1 >= 0:
+        if proceed and origin[-1] != 'D' and currentEX - 1 >= 0:
             swapper2_0(-1, 0, array)
             #path = path + "U"
             queue.append(np.array(array))
-            pathQueue.append("U")
+            originU = origin + "U"
+            pathQueue.append(originU)
+            #pathQueue.append("U")
             swapper2_0(1, 0, array)
         safeValve += 1
         bfs(queue[0], pathQueue[0])
@@ -184,11 +193,20 @@ if __name__ == '__main__':
     queue.append(problem_board)
     pathQueue.append("X")
     print("\nAlgorithm start:")
-    bfs(problem_board, 'N')
-    print(queue)
-    print(len(queue))
-    queue.clear()
-    print(queue)
+
+    #UNCOMMENT FOR BFS
+    # bfs(problem_board, truePath)
+    # print(len(queue))
+    # print(truePath)
+    # queue.clear()
+    # print(queue)
+    # print()
+    # print()
+
+    #UNCOMMENT FOR DFS
+    dfs(problem_board, 'N', 0)
+    print(path)
+
 
     # Options (CMD)
     # print("\nAlgorithm: ", algo)
