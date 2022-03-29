@@ -81,7 +81,7 @@ def dfs(array, origin, brake):
         # Go through board with correct order
         for i in range(4):
             if order[i] == "R":
-                if origin != 'L' and currentY + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+                if proceed and origin != 'L' and currentY + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
                     swapper(currentX, currentY, currentX, currentY + 1)
                     path = path + "R"
                     dfs(array, 'R', brake + 1)
