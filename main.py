@@ -1,27 +1,35 @@
 import numpy as np
 import time
+# import sys
 
 # Default launch options
 algo = "bfs"
 order = "LRDU"
-file = "puzzle.txt"
+read_file = "puzzle.txt"
 
 # Launch options (CMD)
 # algo = sys.argv[1]
 # order = sys.argv[2]
 # file = sys.argv[3]
+# /Launch options (CMD)
 
 # Maximum depth of recursion
 depth = 10
 
 # Boards
 final_board = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]])
-problem_board = np.loadtxt(file, skiprows=1, dtype=int)
+problem_board = np.loadtxt(read_file, skiprows=1, dtype=int)
 
 # Find where are the blank space coordinates
 where0 = np.where(problem_board == 0)
 currentX = where0[0]
 currentY = where0[1]
+
+# Length of path
+path_length = 0
+
+# Final path
+final_path = ""
 
 # BFS queues
 queue = []
@@ -190,7 +198,7 @@ if __name__ == '__main__':
     print(currentY)
 
     # Options (PyCharm)
-    algo = input("Podaj algorytm: ")
+    algo = input("Choose algorithm: ")
     # /Options (PyCharm)
 
     # Count runtime of an algorithm
@@ -199,24 +207,50 @@ if __name__ == '__main__':
     pathQueue.append("X")
     print("\nAlgorithm start:")
 
-    # Options (CMD)
+    # After the algorithm has been chosen
     if algo == "bfs":
         bfs(problem_board, truePath)
         print(len(queue))
+
         print(truePath)
+
+        final_path = truePath[1:]
         queue.clear()
         print(queue)
         print()
-        print()
     elif algo == "dfs":
         dfs(problem_board, 'N', 0)
-        print(path)
-    else:
-        print("Nie podano algorytmu")
-    # /Options (CMD)
 
+        print(path)
+
+        final_path = path[1:]
+        print(final_path)
+    else:
+        print("!!!Error: Non-existing algorithm was chosen!!!")
+
+    # Calculate path length
+    path_length = len(final_path)
+
+    # Save solution to file
+    save_file = open("solution.txt", "w")
+    save_file.write(str(path_length) + "\n")
+    if algo == "bfs":
+        save_file.write(truePath)
+    elif algo == "dfs":
+        save_file.write(path)
+    else:
+        print("!!!Error: Path couldn't have been saved!!!")
+
+    # Close the file
+    save_file.close()
+
+    # Information about operation
     print("\nAlgorithm: ", algo)
     print("Order: ", order)
-    print("Board file: ", file)
+    print("Board file: ", read_file)
 
-    print("\n--- It took: %s seconds ---" % (time.time() - start_time))
+    print("Length of solution: ", path_length)
+    print("Solution: ", final_path)
+    print("Solution file: ", save_file.name)
+
+    print("\n--- Algorithm took: %s seconds ---" % (time.time() - start_time))
