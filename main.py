@@ -6,11 +6,15 @@ import time
 algo = "bfs"
 order = "LRDU"
 read_file = "puzzle.txt"
+save_file = "solution.txt"
+info_file = "info.txt"
 
 # Launch options (CMD)
 # algo = sys.argv[1]
 # order = sys.argv[2]
-# file = sys.argv[3]
+# read_file = sys.argv[3]
+# save_file = sys.argv[4]
+# info_file = sys.argv[5]
 # /Launch options (CMD)
 
 # Maximum depth of recursion
@@ -30,6 +34,9 @@ path_length = 0
 
 # Final path
 final_path = ""
+
+# Time of algorithm working
+time_spent = 0
 
 # BFS queues
 queue = []
@@ -211,46 +218,51 @@ if __name__ == '__main__':
     if algo == "bfs":
         bfs(problem_board, truePath)
         print(len(queue))
-
-        print(truePath)
-
         final_path = truePath[1:]
         queue.clear()
-        print(queue)
-        print()
     elif algo == "dfs":
         dfs(problem_board, 'N', 0)
-
-        print(path)
-
         final_path = path[1:]
-        print(final_path)
     else:
         print("!!!Error: Non-existing algorithm was chosen!!!")
 
     # Calculate path length
     path_length = len(final_path)
 
+    # Information about operation
+    print("\n\nAlgorithm: ", algo)
+    print("Order: ", order)
+    print("Board file: ", read_file)
+
+    print("\nLength of solution: ", path_length)
+    print("Solution: ", final_path)
+    print("Solution file: ", save_file)
+
+    time_spent = round(((time.time() - start_time)*1000), 3)
+    print("\nAlgorithm took: %s milliseconds" % time_spent)
+
+    # FILES
     # Save solution to file
-    save_file = open("solution.txt", "w")
-    save_file.write(str(path_length) + "\n")
+    o_file = open(save_file, "w")
+    o_file.write(str(path_length) + "\n")
     if algo == "bfs":
-        save_file.write(truePath)
+        o_file.write(truePath)
     elif algo == "dfs":
-        save_file.write(path)
+        o_file.write(path)
     else:
         print("!!!Error: Path couldn't have been saved!!!")
 
     # Close the file
-    save_file.close()
+    o_file.close()
 
-    # Information about operation
-    print("\nAlgorithm: ", algo)
-    print("Order: ", order)
-    print("Board file: ", read_file)
+    # Save additional info to file
+    o_file = open(info_file, "w")
+    o_file.write(str(path_length) + "\n\n\n")
+    # 2 linia (liczba całkowita): liczbę stanów odwiedzonych
+    # 3 linia (liczba całkowita): liczbę stanów przetworzonych
+    # 4 linia (liczba całkowita): maksymalną osiągniętą głębokość rekursji
+    o_file.write("\n" + str(time_spent))
 
-    print("Length of solution: ", path_length)
-    print("Solution: ", final_path)
-    print("Solution file: ", save_file.name)
+    o_file.close()
 
-    print("\n--- Algorithm took: %s seconds ---" % (time.time() - start_time))
+
