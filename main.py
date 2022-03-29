@@ -105,8 +105,9 @@ def dfs(array, origin, brake):
                         path = path[:-1]
                     swapper(currentX, currentY, currentX + 1, currentY)
 
+
 # Function to swap blank space with another in table
-def swapper2_0(x, y, array): #Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
+def swapper2_0(x, y, array):  # Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
     whereis0 = np.where(array == 0)
     currentx = whereis0[0]
     currenty = whereis0[1]
@@ -143,34 +144,34 @@ def bfs(array, origin):
             queue.append(np.array(array))
             originR = origin + "R"
             pathQueue.append(originR)
-            #pathQueue.append("R")
+            # pathQueue.append("R")
             swapper2_0(0, -1, array)
 
         if proceed and origin[-1] != 'R' and currentEY - 1 >= 0:
             swapper2_0(0, -1, array)
-            #path = path + "L"
+            # path = path + "L"
             queue.append(np.array(array))
             originL = origin + "L"
             pathQueue.append(originL)
-            #pathQueue.append("L")
+            # pathQueue.append("L")
             swapper2_0(0, 1, array)
 
         if proceed and origin[-1] != 'U' and currentEX + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
             swapper2_0(1, 0, array)
-            #path = path + "D"
+            # path = path + "D"
             queue.append(np.array(array))
             originD = origin + "D"
             pathQueue.append(originD)
-            #pathQueue.append("D")
+            # pathQueue.append("D")
             swapper2_0(-1, 0, array)
 
         if proceed and origin[-1] != 'D' and currentEX - 1 >= 0:
             swapper2_0(-1, 0, array)
-            #path = path + "U"
+            # path = path + "U"
             queue.append(np.array(array))
             originU = origin + "U"
             pathQueue.append(originU)
-            #pathQueue.append("U")
+            # pathQueue.append("U")
             swapper2_0(1, 0, array)
         safeValve += 1
         bfs(queue[0], pathQueue[0])
@@ -188,29 +189,34 @@ if __name__ == '__main__':
     print(currentX)
     print(currentY)
 
+    # Options (PyCharm)
+    algo = input("Podaj algorytm: ")
+    # /Options (PyCharm)
+
     # Count runtime of an algorithm
     start_time = time.time()
     queue.append(problem_board)
     pathQueue.append("X")
     print("\nAlgorithm start:")
 
-    #UNCOMMENT FOR BFS
-    # bfs(problem_board, truePath)
-    # print(len(queue))
-    # print(truePath)
-    # queue.clear()
-    # print(queue)
-    # print()
-    # print()
-
-    #UNCOMMENT FOR DFS
-    dfs(problem_board, 'N', 0)
-    print(path)
-
-
     # Options (CMD)
-    # print("\nAlgorithm: ", algo)
-    # print("Order: ", order)
-    # print("Board file: ", file)
+    if algo == "bfs":
+        bfs(problem_board, truePath)
+        print(len(queue))
+        print(truePath)
+        queue.clear()
+        print(queue)
+        print()
+        print()
+    elif algo == "dfs":
+        dfs(problem_board, 'N', 0)
+        print(path)
+    else:
+        print("Nie podano algorytmu")
+    # /Options (CMD)
+
+    print("\nAlgorithm: ", algo)
+    print("Order: ", order)
+    print("Board file: ", file)
 
     print("\n--- It took: %s seconds ---" % (time.time() - start_time))
