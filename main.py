@@ -126,9 +126,9 @@ def swapper2_0(x, y, array):  # Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
 
 # Breadth first search
 def bfs(array, origin):
-    whereisE0 = np.where(array == 0)
-    currentEX = whereisE0[0]
-    currentEY = whereisE0[1]
+    whereise0 = np.where(array == 0)
+    currentex = whereise0[0]
+    currentey = whereise0[1]
     global proceed
     global queue
     global path
@@ -147,38 +147,38 @@ def bfs(array, origin):
         print()
         queue.pop(0)
         pathQueue.pop(0)
-        if origin[-1] != 'L' and currentEY + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+        if origin[-1] != 'L' and currentey + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
             swapper2_0(0, 1, array)
             queue.append(np.array(array))
-            originR = origin + "R"
-            pathQueue.append(originR)
+            originr = origin + "R"
+            pathQueue.append(originr)
             # pathQueue.append("R")
             swapper2_0(0, -1, array)
 
-        if proceed and origin[-1] != 'R' and currentEY - 1 >= 0:
+        if proceed and origin[-1] != 'R' and currentey - 1 >= 0:
             swapper2_0(0, -1, array)
             # path = path + "L"
             queue.append(np.array(array))
-            originL = origin + "L"
-            pathQueue.append(originL)
+            originl = origin + "L"
+            pathQueue.append(originl)
             # pathQueue.append("L")
             swapper2_0(0, 1, array)
 
-        if proceed and origin[-1] != 'U' and currentEX + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+        if proceed and origin[-1] != 'U' and currentex + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
             swapper2_0(1, 0, array)
             # path = path + "D"
             queue.append(np.array(array))
-            originD = origin + "D"
-            pathQueue.append(originD)
+            origind = origin + "D"
+            pathQueue.append(origind)
             # pathQueue.append("D")
             swapper2_0(-1, 0, array)
 
-        if proceed and origin[-1] != 'D' and currentEX - 1 >= 0:
+        if proceed and origin[-1] != 'D' and currentex - 1 >= 0:
             swapper2_0(-1, 0, array)
             # path = path + "U"
             queue.append(np.array(array))
-            originU = origin + "U"
-            pathQueue.append(originU)
+            originu = origin + "U"
+            pathQueue.append(originu)
             # pathQueue.append("U")
             swapper2_0(1, 0, array)
         safeValve += 1
