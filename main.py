@@ -245,12 +245,7 @@ if __name__ == '__main__':
     # Save solution to file
     o_file = open(save_file, "w")
     o_file.write(str(path_length) + "\n")
-    if algo == "bfs":
-        o_file.write(truePath)
-    elif algo == "dfs":
-        o_file.write(path)
-    else:
-        print("!!!Error: Path couldn't have been saved!!!")
+    o_file.write(final_path)
 
     # Close the file
     o_file.close()
