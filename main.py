@@ -1,6 +1,7 @@
 import numpy as np
 import time
 # import sys
+import xlsxwriter
 
 # Default launch options
 algo = "bfs"
@@ -49,6 +50,10 @@ proceed = True
 
 # Path string
 path = "X"
+
+# Initializing Excel
+workbook = xlsxwriter.Workbook("Results.xlsx")
+worksheet = workbook.add_worksheet('Results')
 
 
 # Function to swap blank space with another in table
@@ -257,7 +262,24 @@ if __name__ == '__main__':
     # 3 linia (liczba całkowita): liczbę stanów przetworzonych
     # 4 linia (liczba całkowita): maksymalną osiągniętą głębokość rekursji
     o_file.write("\n" + str(time_spent))
-
     o_file.close()
 
+    worksheet.write('A1', 'Name')
+    worksheet.write('B1', 'Type')
+    worksheet.write('C1', 'Length')
+    worksheet.write('D1', 'Visited')
+    worksheet.write('E1', 'Searched')
+    worksheet.write('F1', 'Depth')
+    worksheet.write('G1', 'Time')
 
+    index = 2
+    worksheet.write('A' + str(index), read_file)
+    worksheet.write('B' + str(index), order)
+    worksheet.write('C' + str(index), path_length)
+    # worksheet.write('D' + str(index), 'Visited')
+    # worksheet.write('E' + str(index), 'Searched')
+    worksheet.write('G' + str(index), time_spent)
+
+    index += 1
+
+    workbook.close()
