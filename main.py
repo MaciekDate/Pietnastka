@@ -39,7 +39,8 @@ final_path = ""
 # Time of algorithm working
 time_spent = 0
 
-# BFS queues
+# Queues (BFS, A*)
+aqueue = np.array([9999, problem_board, "X"], dtype=object)
 queue = []
 pathQueue = []
 safeValve = 0
@@ -54,6 +55,14 @@ path = "X"
 # Initializing Excel
 workbook = xlsxwriter.Workbook("Results.xlsx")
 worksheet = workbook.add_worksheet('Results')
+
+def hammdist(arrayone, arraytwo):
+    sumr = 0
+    for i in range(4):
+        for j in range(4):
+            if arrayone[i, j] != arraytwo[i, j]:
+             sumr += 1
+    return sumr
 
 
 # Function to swap blank space with another in table
@@ -195,6 +204,67 @@ def bfs(array, origin):
             swapper2_0(1, 0, array)
         safeValve += 1
         bfs(queue[0], pathQueue[0])
+
+
+def hamming(array, origin):
+    whereise0 = np.where(array == 0)
+    currentex = whereise0[0]
+    currentey = whereise0[1]
+    global proceed
+    global aqueue
+    global final_board
+    global safeValve
+    if np.array_equal(array, final_board):
+        print("is equal")
+        print(aqueue[0, 1])
+        print(aqueue[0, 2])
+        aqueue = np.delete(aqueue, 0, axis=0)
+        proceed = False
+        return
+    elif proceed and safeValve < 5000:
+        print("is not equal")
+        print(array)
+        print()
+        if origin[-1] != 'L' and currentey + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+            swapper2_0(0, 1, array)
+            # path = path + "R"
+            # queue.append(np.array(array))
+            originr = origin + "R"
+            aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(originr), np.array(array), originr], dtype=object)])
+            # pathQueue.append("R")
+            swapper2_0(0, -1, array)
+
+        if proceed and origin[-1] != 'R' and currentey - 1 >= 0:
+            swapper2_0(0, -1, array)
+            # path = path + "L"
+            # queue.append(np.array(array))
+            originl = origin + "L"
+            aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(originl), np.array(array), originl], dtype=object)])
+            # pathQueue.append("L")
+            swapper2_0(0, 1, array)
+
+        if proceed and origin[-1] != 'U' and currentex + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+            swapper2_0(1, 0, array)
+            # path = path + "D"
+            # queue.append(np.array(array))
+            origind = origin + "D"
+            aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(origind), np.array(array), origind], dtype=object)])
+            # pathQueue.append("D")
+            swapper2_0(-1, 0, array)
+
+        if proceed and origin[-1] != 'D' and currentex - 1 >= 0:
+            swapper2_0(-1, 0, array)
+            # path = path + "U"
+            # queue.append(np.array(array))
+            originu = origin + "U"
+            aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(originu), np.array(array), originu], dtype=object)])
+            # pathQueue.append("U")
+            swapper2_0(1, 0, array)
+        safeValve += 1
+        aqueue = np.delete(aqueue, 0, axis=0)
+        aqueue = aqueue[aqueue[:, 0].argsort()]
+        hamming(aqueue[0, 1], aqueue[0, 2])
+
 
 
 # Main function
