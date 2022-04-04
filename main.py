@@ -39,12 +39,15 @@ final_path = ""
 # Time of algorithm working
 time_spent = 0
 
-# Queues (BFS, A*)
-aqueue = np.array([9999, problem_board, "X"], dtype=object)
+# BFS utilities
 queue = []
 pathQueue = []
 safeValve = 0
 truePath = 'X'
+
+# Hamming utilities
+aqueue = np.array([9999, problem_board, "X"], dtype=object)
+apath = ""
 
 # Global search stopper
 proceed = True
@@ -152,7 +155,6 @@ def bfs(array, origin):
     currentey = whereise0[1]
     global proceed
     global queue
-    global path
     global safeValve
     global truePath
     if np.array_equal(array, final_board):
@@ -214,10 +216,12 @@ def hamming(array, origin):
     global aqueue
     global final_board
     global safeValve
+    global apath
     if np.array_equal(array, final_board):
         print("is equal")
         print(aqueue[0, 1])
         print(aqueue[0, 2])
+        apath = aqueue[0, 2]
         aqueue = np.delete(aqueue, 0, axis=0)
         proceed = False
         return
@@ -298,6 +302,9 @@ if __name__ == '__main__':
     elif algo == "dfs":
         dfs(problem_board, 'N', 0)
         final_path = path[1:]
+    elif algo == "hamm":
+        hamming(problem_board, "X")
+        final_path = apath[1:]
     else:
         print("!!!Error: Non-existing algorithm was chosen!!!")
 
