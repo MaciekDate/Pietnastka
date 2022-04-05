@@ -1,5 +1,6 @@
 import numpy as np
 import time
+import math
 # import sys
 import xlsxwriter
 
@@ -80,13 +81,13 @@ def hammdist(arrayone, arraytwo):
              sumr += 1
     return sumr
 
-# def mandist(arrayone, arraytwo):
-#     sumr = 0
-#     for i in range(4):
-#         for j in range(4):
-#             if arrayone[i, j] != 0:
-#                 sumr +=
-#     return sumr
+def mandist(arrayone):
+    sumr = 0
+    for i in range(4):
+        for j in range(4):
+            if arrayone[i, j] != 0:
+                sumr = sumr + abs(i - math.floor(arrayone[i, j] % 4)) + abs(j - ((arrayone[i, j]-1) % 4))
+    return sumr
 
 # Function to swap blank space with another in table
 def swapper(x1, y1, x2, y2):  # Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
@@ -313,6 +314,77 @@ def hamming(array, origin):
     else:
         visited += 1
 
+def manhattan(array, origin):
+    whereise0 = np.where(array == 0)
+    currentex = whereise0[0]
+    currentey = whereise0[1]
+    global proceed
+    global aqueue
+    global final_board
+    global safeValve
+    global apath
+    global searched
+    global visited
+    global reacheddepth
+
+    if unique(array):
+        searched.append(np.array(array))
+        if np.array_equal(array, final_board):
+            print("is equal")
+            print(aqueue[0, 1])
+            print(aqueue[0, 2])
+            apath = aqueue[0, 2]
+            aqueue = np.delete(aqueue, 0, axis=0)
+            proceed = False
+            return
+        elif proceed and safeValve < 5000:
+            print("is not equal")
+            print(array)
+            print()
+            if origin[-1] != 'L' and currentey + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+                swapper2_0(0, 1, array)
+                # path = path + "R"
+                # queue.append(np.array(array))
+                originr = origin + "R"
+                aqueue = np.vstack([aqueue, np.array([mandist(array) + len(originr), np.array(array), originr], dtype=object)])
+                # pathQueue.append("R")
+                swapper2_0(0, -1, array)
+
+            if proceed and origin[-1] != 'R' and currentey - 1 >= 0:
+                swapper2_0(0, -1, array)
+                # path = path + "L"
+                # queue.append(np.array(array))
+                originl = origin + "L"
+                aqueue = np.vstack([aqueue, np.array([mandist(array) + len(originl), np.array(array), originl], dtype=object)])
+                # pathQueue.append("L")
+                swapper2_0(0, 1, array)
+
+            if proceed and origin[-1] != 'U' and currentex + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+                swapper2_0(1, 0, array)
+                # path = path + "D"
+                # queue.append(np.array(array))
+                origind = origin + "D"
+                aqueue = np.vstack([aqueue, np.array([mandist(array) + len(origind), np.array(array), origind], dtype=object)])
+                # pathQueue.append("D")
+                swapper2_0(-1, 0, array)
+
+            if proceed and origin[-1] != 'D' and currentex - 1 >= 0:
+                swapper2_0(-1, 0, array)
+                # path = path + "U"
+                # queue.append(np.array(array))
+                originu = origin + "U"
+                aqueue = np.vstack([aqueue, np.array([mandist(array) + len(originu), np.array(array), originu], dtype=object)])
+                # pathQueue.append("U")
+                swapper2_0(1, 0, array)
+            safeValve += 1
+            aqueue = np.delete(aqueue, 0, axis=0)
+            aqueue = aqueue[aqueue[:, 0].argsort()]
+            if len(aqueue[0, 2]) > reacheddepth:
+                reacheddepth = len(aqueue[0, 2])
+            manhattan(aqueue[0, 1], aqueue[0, 2])
+    else:
+        visited += 1
+
 # Main function
 if __name__ == '__main__':
     print("Final board:")
@@ -348,6 +420,10 @@ if __name__ == '__main__':
         reacheddepth = "XD"
     elif algo == "hamm":
         hamming(problem_board, "X")
+        final_path = apath[1:]
+        reacheddepth -= 1
+    elif algo == "manh":
+        manhattan(problem_board, "X")
         final_path = apath[1:]
         reacheddepth -= 1
     else:
