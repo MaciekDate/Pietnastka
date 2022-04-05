@@ -19,11 +19,16 @@ info_file = "info.txt"
 # /Launch options (CMD)
 
 # Maximum depth of recursion
-depth = 10
+depth = 20
+reacheddepth = 0
 
 # Boards
 final_board = np.array([[1, 2, 3, 4], [5, 6, 7, 8], [9, 10, 11, 12], [13, 14, 15, 0]])
 problem_board = np.loadtxt(read_file, skiprows=1, dtype=int)
+
+# Searched array
+searched = []
+visited = 0
 
 # Find where are the blank space coordinates
 where0 = np.where(problem_board == 0)
@@ -59,6 +64,14 @@ path = "X"
 workbook = xlsxwriter.Workbook("Results.xlsx")
 worksheet = workbook.add_worksheet('Results')
 
+def unique(array):
+    global searched
+    for i in range(len(searched)):
+        if np.array_equal(array, searched[i]):
+            return False
+    return True
+
+
 def hammdist(arrayone, arraytwo):
     sumr = 0
     for i in range(4):
@@ -67,6 +80,13 @@ def hammdist(arrayone, arraytwo):
              sumr += 1
     return sumr
 
+# def mandist(arrayone, arraytwo):
+#     sumr = 0
+#     for i in range(4):
+#         for j in range(4):
+#             if arrayone[i, j] != 0:
+#                 sumr +=
+#     return sumr
 
 # Function to swap blank space with another in table
 def swapper(x1, y1, x2, y2):  # Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
@@ -86,57 +106,65 @@ def dfs(array, origin, brake):
     global proceed
     global path
     global order
-    # Check if current board is not a solution yet
-    if np.array_equal(array, final_board):
-        print("is equal")
-        print(array)
-        proceed = False
-        return
-    # If it's not the solution
-    elif proceed:
-        print("is not equal")
-        print(array)
-        print()
-        # When we go beyond depth
-        if brake > depth:
-            print("Branch exhausted")
-            print()
-            return
-        # Go through board with correct order
-        for i in range(4):
-            if order[i] == "R":
-                if proceed and origin != 'L' and currentY + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
-                    swapper(currentX, currentY, currentX, currentY + 1)
-                    path = path + "R"
-                    dfs(array, 'R', brake + 1)
-                    if proceed:
-                        path = path[:-1]
-                    swapper(currentX, currentY, currentX, currentY - 1)
-            elif order[i] == "L":
-                if proceed and origin != 'R' and currentY - 1 >= 0:
-                    swapper(currentX, currentY, currentX, currentY - 1)
-                    path = path + "L"
-                    dfs(array, 'L', brake + 1)
-                    if proceed:
-                        path = path[:-1]
-                    swapper(currentX, currentY, currentX, currentY + 1)
-            elif order[i] == "D":
-                if proceed and origin != 'U' and currentX + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
-                    swapper(currentX, currentY, currentX + 1, currentY)
-                    path = path + "D"
-                    dfs(array, 'D', brake + 1)
-                    if proceed:
-                        path = path[:-1]
-                    swapper(currentX, currentY, currentX - 1, currentY)
-            elif order[i] == "U":
-                if proceed and origin != 'D' and currentX - 1 >= 0:
-                    swapper(currentX, currentY, currentX - 1, currentY)
-                    path = path + "U"
-                    dfs(array, 'U', brake + 1)
-                    if proceed:
-                        path = path[:-1]
-                    swapper(currentX, currentY, currentX + 1, currentY)
+    global searched
+    global visited
+    global reacheddepth
 
+    if unique(array):
+        searched.append(np.array(array))
+
+        # Check if current board is not a solution yet
+        if np.array_equal(array, final_board):
+            print("is equal")
+            print(array)
+            proceed = False
+            return
+        # If it's not the solution
+        elif proceed:
+            print("is not equal")
+            print(array)
+            print()
+            # When we go beyond depth
+            if brake > depth:
+                print("Branch exhausted")
+                print()
+                return
+            # Go through board with correct order
+            for i in range(4):
+                if order[i] == "R":
+                    if proceed and origin != 'L' and currentY + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+                        swapper(currentX, currentY, currentX, currentY + 1)
+                        path = path + "R"
+                        dfs(array, 'R', brake + 1)
+                        if proceed:
+                            path = path[:-1]
+                        swapper(currentX, currentY, currentX, currentY - 1)
+                elif order[i] == "L":
+                    if proceed and origin != 'R' and currentY - 1 >= 0:
+                        swapper(currentX, currentY, currentX, currentY - 1)
+                        path = path + "L"
+                        dfs(array, 'L', brake + 1)
+                        if proceed:
+                            path = path[:-1]
+                        swapper(currentX, currentY, currentX, currentY + 1)
+                elif order[i] == "D":
+                    if proceed and origin != 'U' and currentX + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+                        swapper(currentX, currentY, currentX + 1, currentY)
+                        path = path + "D"
+                        dfs(array, 'D', brake + 1)
+                        if proceed:
+                            path = path[:-1]
+                        swapper(currentX, currentY, currentX - 1, currentY)
+                elif order[i] == "U":
+                    if proceed and origin != 'D' and currentX - 1 >= 0:
+                        swapper(currentX, currentY, currentX - 1, currentY)
+                        path = path + "U"
+                        dfs(array, 'U', brake + 1)
+                        if proceed:
+                            path = path[:-1]
+                        swapper(currentX, currentY, currentX + 1, currentY)
+    else:
+        visited += 1
 
 # Function to swap blank space with another in table
 def swapper2_0(x, y, array):  # Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
@@ -157,6 +185,12 @@ def bfs(array, origin):
     global queue
     global safeValve
     global truePath
+    global visited
+    global searched
+    if unique(array):
+        searched.append(np.array(array))
+    else:
+        visited += 1
     if np.array_equal(array, final_board):
         print("is equal")
         print(queue[0])
@@ -217,59 +251,67 @@ def hamming(array, origin):
     global final_board
     global safeValve
     global apath
-    if np.array_equal(array, final_board):
-        print("is equal")
-        print(aqueue[0, 1])
-        print(aqueue[0, 2])
-        apath = aqueue[0, 2]
-        aqueue = np.delete(aqueue, 0, axis=0)
-        proceed = False
-        return
-    elif proceed and safeValve < 5000:
-        print("is not equal")
-        print(array)
-        print()
-        if origin[-1] != 'L' and currentey + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
-            swapper2_0(0, 1, array)
-            # path = path + "R"
-            # queue.append(np.array(array))
-            originr = origin + "R"
-            aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(originr), np.array(array), originr], dtype=object)])
-            # pathQueue.append("R")
-            swapper2_0(0, -1, array)
+    global searched
+    global visited
+    global reacheddepth
 
-        if proceed and origin[-1] != 'R' and currentey - 1 >= 0:
-            swapper2_0(0, -1, array)
-            # path = path + "L"
-            # queue.append(np.array(array))
-            originl = origin + "L"
-            aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(originl), np.array(array), originl], dtype=object)])
-            # pathQueue.append("L")
-            swapper2_0(0, 1, array)
+    if unique(array):
+        searched.append(np.array(array))
+        if np.array_equal(array, final_board):
+            print("is equal")
+            print(aqueue[0, 1])
+            print(aqueue[0, 2])
+            apath = aqueue[0, 2]
+            aqueue = np.delete(aqueue, 0, axis=0)
+            proceed = False
+            return
+        elif proceed and safeValve < 5000:
+            print("is not equal")
+            print(array)
+            print()
+            if origin[-1] != 'L' and currentey + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+                swapper2_0(0, 1, array)
+                # path = path + "R"
+                # queue.append(np.array(array))
+                originr = origin + "R"
+                aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(originr), np.array(array), originr], dtype=object)])
+                # pathQueue.append("R")
+                swapper2_0(0, -1, array)
 
-        if proceed and origin[-1] != 'U' and currentex + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
-            swapper2_0(1, 0, array)
-            # path = path + "D"
-            # queue.append(np.array(array))
-            origind = origin + "D"
-            aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(origind), np.array(array), origind], dtype=object)])
-            # pathQueue.append("D")
-            swapper2_0(-1, 0, array)
+            if proceed and origin[-1] != 'R' and currentey - 1 >= 0:
+                swapper2_0(0, -1, array)
+                # path = path + "L"
+                # queue.append(np.array(array))
+                originl = origin + "L"
+                aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(originl), np.array(array), originl], dtype=object)])
+                # pathQueue.append("L")
+                swapper2_0(0, 1, array)
 
-        if proceed and origin[-1] != 'D' and currentex - 1 >= 0:
-            swapper2_0(-1, 0, array)
-            # path = path + "U"
-            # queue.append(np.array(array))
-            originu = origin + "U"
-            aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(originu), np.array(array), originu], dtype=object)])
-            # pathQueue.append("U")
-            swapper2_0(1, 0, array)
-        safeValve += 1
-        aqueue = np.delete(aqueue, 0, axis=0)
-        aqueue = aqueue[aqueue[:, 0].argsort()]
-        hamming(aqueue[0, 1], aqueue[0, 2])
+            if proceed and origin[-1] != 'U' and currentex + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+                swapper2_0(1, 0, array)
+                # path = path + "D"
+                # queue.append(np.array(array))
+                origind = origin + "D"
+                aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(origind), np.array(array), origind], dtype=object)])
+                # pathQueue.append("D")
+                swapper2_0(-1, 0, array)
 
-
+            if proceed and origin[-1] != 'D' and currentex - 1 >= 0:
+                swapper2_0(-1, 0, array)
+                # path = path + "U"
+                # queue.append(np.array(array))
+                originu = origin + "U"
+                aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(originu), np.array(array), originu], dtype=object)])
+                # pathQueue.append("U")
+                swapper2_0(1, 0, array)
+            safeValve += 1
+            aqueue = np.delete(aqueue, 0, axis=0)
+            aqueue = aqueue[aqueue[:, 0].argsort()]
+            if len(aqueue[0, 2]) > reacheddepth:
+                reacheddepth = len(aqueue[0, 2])
+            hamming(aqueue[0, 1], aqueue[0, 2])
+    else:
+        visited += 1
 
 # Main function
 if __name__ == '__main__':
@@ -298,13 +340,16 @@ if __name__ == '__main__':
         bfs(problem_board, truePath)
         print(len(queue))
         final_path = truePath[1:]
+        reacheddepth = len(final_path)
         queue.clear()
     elif algo == "dfs":
         dfs(problem_board, 'N', 0)
         final_path = path[1:]
+        reacheddepth = "XD"
     elif algo == "hamm":
         hamming(problem_board, "X")
         final_path = apath[1:]
+        reacheddepth -= 1
     else:
         print("!!!Error: Non-existing algorithm was chosen!!!")
 
@@ -318,6 +363,7 @@ if __name__ == '__main__':
 
     print("\nLength of solution: ", path_length)
     print("Solution: ", final_path)
+    print("Maximum depth: ", reacheddepth)
     print("Solution file: ", save_file)
 
     time_spent = round(((time.time() - start_time)*1000), 3)
@@ -360,3 +406,6 @@ if __name__ == '__main__':
     index += 1
 
     workbook.close()
+
+    print(len(searched))
+    print(visited)
