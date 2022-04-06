@@ -288,7 +288,7 @@ def hamming(array, origin):
             aqueue = np.delete(aqueue, 0, axis=0)
             proceed = False
             return
-        elif proceed and safeValve < 5000:
+        elif proceed:
             #print("is not equal")
             #print(array)
             #print()
@@ -327,15 +327,13 @@ def hamming(array, origin):
                 aqueue = np.vstack([aqueue, np.array([hammdist(array, final_board) + len(originu), np.array(array), originu], dtype=object)])
                 # pathQueue.append("U")
                 swapper2_0(1, 0, array)
-            safeValve += 1
-            aqueue = np.delete(aqueue, 0, axis=0)
-            aqueue = aqueue[aqueue[:, 0].argsort()]
-            if len(aqueue[0, 2]) > reacheddepth:
-                reacheddepth = len(aqueue[0, 2])
-            hamming(aqueue[0, 1], aqueue[0, 2])
     else:
         visited += 1
-
+    aqueue = np.delete(aqueue, 0, axis=0)
+    aqueue = aqueue[aqueue[:, 0].argsort()]
+    if len(aqueue[0, 2]) > reacheddepth:
+        reacheddepth = len(aqueue[0, 2])
+    hamming(aqueue[0, 1], aqueue[0, 2])
 
 def manhattan(array, origin):
     whereise0 = np.where(array == 0)
@@ -360,7 +358,7 @@ def manhattan(array, origin):
             aqueue = np.delete(aqueue, 0, axis=0)
             proceed = False
             return
-        elif proceed and safeValve < 5000:
+        elif proceed:
             #print("is not equal")
             #print(array)
             #print()
@@ -399,16 +397,15 @@ def manhattan(array, origin):
                 aqueue = np.vstack([aqueue, np.array([mandist(array) + len(originu), np.array(array), originu], dtype=object)])
                 # pathQueue.append("U")
                 swapper2_0(1, 0, array)
-            safeValve += 1
-            aqueue = np.delete(aqueue, 0, axis=0)
-            aqueue = aqueue[aqueue[:, 0].argsort()]
-            if len(aqueue[0, 2]) > reacheddepth:
-                reacheddepth = len(aqueue[0, 2])
-            print(mandist(array))
-            manhattan(aqueue[0, 1], aqueue[0, 2])
     else:
         visited += 1
 
+
+    aqueue = np.delete(aqueue, 0, axis=0)
+    aqueue = aqueue[aqueue[:, 0].argsort()]
+    if len(aqueue[0, 2]) > reacheddepth:
+        reacheddepth = len(aqueue[0, 2])
+    manhattan(aqueue[0, 1], aqueue[0, 2])
 
 # Main function
 if __name__ == '__main__':
