@@ -212,8 +212,8 @@ def bfs(array, origin):
     else:
         visited += 1
     if np.array_equal(array, final_board):
-        print("is equal")
-        print(queue[0])
+        # print("is equal")
+        # print(queue[0])
         queue.pop(0)
         truePath = pathQueue.pop(0)
         proceed = False
@@ -423,51 +423,50 @@ if __name__ == '__main__':
     # /Options (PyCharm)
 
     # Count runtime of an algorithm
-    start_time = time.time()
     queue.append(problem_board)
     pathQueue.append("X")
-    print("\nAlgorithm start:")
+    # print("\nAlgorithm start:")
 
-    # After the algorithm has been chosen
-    if algo == "bfs":
-        bfs(problem_board, truePath)
-        print(len(queue))
-        final_path = truePath[1:]
-        reacheddepth = len(final_path)
-        queue.clear()
-    elif algo == "dfs":
-        dfs(problem_board, 'N', 0)
-        final_path = path[1:]
-        #reacheddepth = visited
-    elif algo == "hamm":
-        hamming(problem_board, "X")
-        final_path = apath[1:]
-        reacheddepth -= 1
-    elif algo == "manh":
-        manhattan(problem_board, "X")
-        final_path = apath[1:]
-        reacheddepth -= 1
-    else:
-        print("!!!Error: Non-existing algorithm was chosen!!!")
+    # # After the algorithm has been chosen
+    # if algo == "bfs":
+    #     bfs(problem_board, truePath)
+    #     print(len(queue))
+    #     final_path = truePath[1:]
+    #     reacheddepth = len(final_path)
+    #     queue.clear()
+    # elif algo == "dfs":
+    #     dfs(problem_board, 'N', 0)
+    #     final_path = path[1:]
+    #     #reacheddepth = visited
+    # elif algo == "hamm":
+    #     hamming(problem_board, "X")
+    #     final_path = apath[1:]
+    #     reacheddepth -= 1
+    # elif algo == "manh":
+    #     manhattan(problem_board, "X")
+    #     final_path = apath[1:]
+    #     reacheddepth -= 1
+    # else:
+    #     print("!!!Error: Non-existing algorithm was chosen!!!")
 
-    # Calculate path length
-    path_length = len(final_path)
-
-    # Information about operation
-    print("\n\nAlgorithm: ", algo)
-    print("Order: ", order)
-    print("Board file: ", read_file)
-
-    print("\nLength of solution: ", path_length)
-    print("Solution: ", final_path)
-    print("Maximum depth: ", reacheddepth)
-    print("Amount processed: ", len(searched))
-    print("Amount visited: ", len(searched) + visited)
-
-    print("Solution file: ", save_file)
-
-    time_spent = round(((time.time() - start_time)*1000), 3)
-    print("\nAlgorithm took: %s milliseconds" % time_spent)
+    # # Calculate path length
+    # path_length = len(final_path)
+    #
+    # # Information about operation
+    # print("\n\nAlgorithm: ", algo)
+    # print("Order: ", order)
+    # print("Board file: ", read_file)
+    #
+    # print("\nLength of solution: ", path_length)
+    # print("Solution: ", final_path)
+    # print("Maximum depth: ", reacheddepth)
+    # print("Amount processed: ", len(searched))
+    # print("Amount visited: ", len(searched) + visited)
+    #
+    # print("Solution file: ", save_file)
+    #
+    # time_spent = round(((time.time() - start_time)*1000), 3)
+    # print("\nAlgorithm took: %s milliseconds" % time_spent)
 
     # FILES
     # Save solution to file
@@ -495,29 +494,18 @@ if __name__ == '__main__':
     worksheet.write('F1', 'Depth')
     worksheet.write('G1', 'Time')
 
+    # print(len(searched))
+    # print(visited)
+
     index = 2
-    worksheet.write('A' + str(index), read_file)
-    worksheet.write('B' + str(index), order)
-    worksheet.write('C' + str(index), path_length)
-    # worksheet.write('D' + str(index), 'Visited')
-    # worksheet.write('E' + str(index), 'Searched')
-    worksheet.write('G' + str(index), time_spent)
-
-    index += 1
-
-    workbook.close()
-
-    print(len(searched))
-    print(visited)
-
     yourpath = '7'
-    iterator = 0
+    # iterator = 0
     for root, dirs, files in os.walk(yourpath, topdown=False):
         for name in files:
-            print(os.path.join(name))
+            # print(os.path.join(name))
             # Function
             problem_board = np.loadtxt("7/"+os.path.join(name), skiprows=1, dtype=int)
-            print(problem_board)
+            # print(problem_board)
 
             truePath = "X"
             proceed = True
@@ -526,11 +514,27 @@ if __name__ == '__main__':
             searched = []
             visited = 0
             if algo == "bfs":
+                start_time = time.time()
                 bfs(problem_board, truePath)
+                time_spent = round(((time.time() - start_time) * 1000), 3)
                 final_path = truePath[1:]
                 reacheddepth = len(final_path)
                 queue.clear()
                 pathQueue.clear()
+            elif algo == "dfs":
+                dfs(problem_board, 'N', 0)
+                final_path = path[1:]
+                #reacheddepth = visited
+            elif algo == "hamm":
+                hamming(problem_board, "X")
+                final_path = apath[1:]
+                reacheddepth -= 1
+            elif algo == "manh":
+                manhattan(problem_board, "X")
+                final_path = apath[1:]
+                reacheddepth -= 1
+            else:
+                print("!!!Error: Non-existing algorithm was chosen!!!")
 
             # Calculate path length
             path_length = len(final_path)
@@ -546,11 +550,18 @@ if __name__ == '__main__':
             print("Amount processed: ", len(searched))
             print("Amount visited: ", len(searched) + visited)
 
-            time_spent = round(((time.time() - start_time) * 1000), 3)
             print("\nAlgorithm took: %s milliseconds" % time_spent)
 
-            iterator = iterator + 1
+            worksheet.write('A' + str(index), os.path.join(name))
+            worksheet.write('B' + str(index), order)
+            worksheet.write('C' + str(index), path_length)
+            worksheet.write('D' + str(index), len(searched) + visited)
+            worksheet.write('E' + str(index), len(searched))
+            worksheet.write('G' + str(index), time_spent)
+
+            index = index + 1
 
             # End of function
 
-    print("Liczba ogarnietych tablic: " + str(iterator))
+    # print("Liczba ogarnietych tablic: " + str(iterator))
+    workbook.close()
