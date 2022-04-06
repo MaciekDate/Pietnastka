@@ -278,17 +278,17 @@ def hamming(array, origin):
     if unique(array):
         searched.append(np.array(array))
         if np.array_equal(array, final_board):
-            print("is equal")
-            print(aqueue[0, 1])
-            print(aqueue[0, 2])
+            #print("is equal")
+            #print(aqueue[0, 1])
+            #print(aqueue[0, 2])
             apath = aqueue[0, 2]
             aqueue = np.delete(aqueue, 0, axis=0)
             proceed = False
             return
         elif proceed and safeValve < 5000:
-            print("is not equal")
-            print(array)
-            print()
+            #print("is not equal")
+            #print(array)
+            #print()
             if origin[-1] != 'L' and currentey + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
                 swapper2_0(0, 1, array)
                 # path = path + "R"
@@ -350,17 +350,17 @@ def manhattan(array, origin):
     if unique(array):
         searched.append(np.array(array))
         if np.array_equal(array, final_board):
-            print("is equal")
-            print(aqueue[0, 1])
-            print(aqueue[0, 2])
+            #print("is equal")
+            #print(aqueue[0, 1])
+            #print(aqueue[0, 2])
             apath = aqueue[0, 2]
             aqueue = np.delete(aqueue, 0, axis=0)
             proceed = False
             return
         elif proceed and safeValve < 5000:
-            print("is not equal")
-            print(array)
-            print()
+            #print("is not equal")
+            #print(array)
+            #print()
             if origin[-1] != 'L' and currentey + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
                 swapper2_0(0, 1, array)
                 # path = path + "R"
@@ -513,6 +513,7 @@ if __name__ == '__main__':
             pathQueue.append("X")
             searched = []
             visited = 0
+            aqueue = np.array([9999, problem_board, "X"], dtype=object)
             if algo == "bfs":
                 start_time = time.time()
                 bfs(problem_board, truePath)
