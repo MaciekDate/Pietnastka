@@ -7,7 +7,8 @@ import os
 
 # Default launch options
 algo = "bfs"
-order = "LRDU"
+#RDUL,
+order = "RDUL"
 read_file = "puzzle.txt"
 save_file = "solution.txt"
 info_file = "info.txt"
@@ -224,41 +225,43 @@ def bfs(array, origin):
         #print()
         queue.pop(0)
         pathQueue.pop(0)
-        if origin[-1] != 'L' and currentey + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
-            swapper2_0(0, 1, array)
-            queue.append(np.array(array))
-            originr = origin + "R"
-            pathQueue.append(originr)
-            # pathQueue.append("R")
-            swapper2_0(0, -1, array)
-
-        if proceed and origin[-1] != 'R' and currentey - 1 >= 0:
-            swapper2_0(0, -1, array)
-            # path = path + "L"
-            queue.append(np.array(array))
-            originl = origin + "L"
-            pathQueue.append(originl)
-            # pathQueue.append("L")
-            swapper2_0(0, 1, array)
-
-        if proceed and origin[-1] != 'U' and currentex + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
-            swapper2_0(1, 0, array)
-            # path = path + "D"
-            queue.append(np.array(array))
-            origind = origin + "D"
-            pathQueue.append(origind)
-            # pathQueue.append("D")
-            swapper2_0(-1, 0, array)
-
-        if proceed and origin[-1] != 'D' and currentex - 1 >= 0:
-            swapper2_0(-1, 0, array)
-            # path = path + "U"
-            queue.append(np.array(array))
-            originu = origin + "U"
-            pathQueue.append(originu)
-            # pathQueue.append("U")
-            swapper2_0(1, 0, array)
-        #safeValve += 1
+        for i in range(4):
+            if order[i] == "R":
+                if origin[-1] != 'L' and currentey + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+                    swapper2_0(0, 1, array)
+                    queue.append(np.array(array))
+                    originr = origin + "R"
+                    pathQueue.append(originr)
+                    # pathQueue.append("R")
+                    swapper2_0(0, -1, array)
+            elif order[i] == "L":
+                if proceed and origin[-1] != 'R' and currentey - 1 >= 0:
+                    swapper2_0(0, -1, array)
+                    # path = path + "L"
+                    queue.append(np.array(array))
+                    originl = origin + "L"
+                    pathQueue.append(originl)
+                    # pathQueue.append("L")
+                    swapper2_0(0, 1, array)
+            elif order[i] == "D":
+                if proceed and origin[-1] != 'U' and currentex + 1 <= 3:  # ADD SPECIFIC VALUE READ FROM FILE!!!
+                    swapper2_0(1, 0, array)
+                    # path = path + "D"
+                    queue.append(np.array(array))
+                    origind = origin + "D"
+                    pathQueue.append(origind)
+                    # pathQueue.append("D")
+                    swapper2_0(-1, 0, array)
+            elif order[i] == "U":
+                if proceed and origin[-1] != 'D' and currentex - 1 >= 0:
+                    swapper2_0(-1, 0, array)
+                    # path = path + "U"
+                    queue.append(np.array(array))
+                    originu = origin + "U"
+                    pathQueue.append(originu)
+                    # pathQueue.append("U")
+                    swapper2_0(1, 0, array)
+                #safeValve += 1
         bfs(queue[0], pathQueue[0])
 
 
@@ -401,6 +404,7 @@ def manhattan(array, origin):
             aqueue = aqueue[aqueue[:, 0].argsort()]
             if len(aqueue[0, 2]) > reacheddepth:
                 reacheddepth = len(aqueue[0, 2])
+            print(mandist(array))
             manhattan(aqueue[0, 1], aqueue[0, 2])
     else:
         visited += 1
@@ -507,12 +511,19 @@ if __name__ == '__main__':
             problem_board = np.loadtxt("7/"+os.path.join(name), skiprows=1, dtype=int)
             # print(problem_board)
 
+            where0 = np.where(problem_board == 0)
+            currentX = where0[0]
+            currentY = where0[1]
+            path = "X"
+
             truePath = "X"
             proceed = True
             queue.append(problem_board)
             pathQueue.append("X")
             searched = []
             visited = 0
+            reacheddepth = 0
+            apath = ""
             aqueue = np.array([9999, problem_board, "X"], dtype=object)
             if algo == "bfs":
                 start_time = time.time()
@@ -523,15 +534,21 @@ if __name__ == '__main__':
                 queue.clear()
                 pathQueue.clear()
             elif algo == "dfs":
+                start_time = time.time()
                 dfs(problem_board, 'N', 0)
+                time_spent = round(((time.time() - start_time) * 1000), 3)
                 final_path = path[1:]
                 #reacheddepth = visited
             elif algo == "hamm":
+                start_time = time.time()
                 hamming(problem_board, "X")
+                time_spent = round(((time.time() - start_time) * 1000), 3)
                 final_path = apath[1:]
                 reacheddepth -= 1
             elif algo == "manh":
+                start_time = time.time()
                 manhattan(problem_board, "X")
+                time_spent = round(((time.time() - start_time) * 1000), 3)
                 final_path = apath[1:]
                 reacheddepth -= 1
             else:
@@ -548,7 +565,11 @@ if __name__ == '__main__':
             print("\nLength of solution: ", path_length)
             print("Solution: ", final_path)
             print("Maximum depth: ", reacheddepth)
-            print("Amount processed: ", len(searched))
+            if algo == "dfs":
+                print("Amount processed: ", visited)
+            else:
+                print("Amount processed: ", len(searched))
+
             print("Amount visited: ", len(searched) + visited)
 
             print("\nAlgorithm took: %s milliseconds" % time_spent)
@@ -557,7 +578,11 @@ if __name__ == '__main__':
             worksheet.write('B' + str(index), order)
             worksheet.write('C' + str(index), path_length)
             worksheet.write('D' + str(index), len(searched) + visited)
-            worksheet.write('E' + str(index), len(searched))
+            if algo == "dfs":
+                worksheet.write('E' + str(index), visited)
+            else:
+                worksheet.write('E' + str(index), len(searched))
+            worksheet.write('F' + str(index), reacheddepth)
             worksheet.write('G' + str(index), time_spent)
 
             index = index + 1
