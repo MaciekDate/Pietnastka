@@ -7,8 +7,8 @@ import os
 
 # Default launch options
 algo = "bfs"
-#RDUL,
-order = "RDUL"
+#RDUL, RDLU, DRUL, DRLU
+order = "DRLU"
 read_file = "puzzle.txt"
 save_file = "solution.txt"
 info_file = "info.txt"
