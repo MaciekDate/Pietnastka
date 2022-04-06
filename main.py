@@ -1,8 +1,9 @@
 import numpy as np
 import time
 import math
-# import sys
 import xlsxwriter
+import os
+# import sys
 
 # Default launch options
 algo = "bfs"
@@ -65,6 +66,7 @@ path = "X"
 workbook = xlsxwriter.Workbook("Results.xlsx")
 worksheet = workbook.add_worksheet('Results')
 
+
 def unique(array):
     global searched
     for i in range(len(searched)):
@@ -81,6 +83,7 @@ def hammdist(arrayone, arraytwo):
              sumr += 1
     return sumr
 
+
 def mandist(arrayone):
     sumr = 0
     for i in range(4):
@@ -88,6 +91,7 @@ def mandist(arrayone):
             if arrayone[i, j] != 0:
                 sumr = sumr + abs(i - math.floor(arrayone[i, j] % 4)) + abs(j - ((arrayone[i, j]-1) % 4))
     return sumr
+
 
 # Function to swap blank space with another in table
 def swapper(x1, y1, x2, y2):  # Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
@@ -166,6 +170,7 @@ def dfs(array, origin, brake):
                         swapper(currentX, currentY, currentX + 1, currentY)
     else:
         visited += 1
+
 
 # Function to swap blank space with another in table
 def swapper2_0(x, y, array):  # Y IS FOR HORIZONTAL, X IS FOR DIAGONAL
@@ -314,6 +319,7 @@ def hamming(array, origin):
     else:
         visited += 1
 
+
 def manhattan(array, origin):
     whereise0 = np.where(array == 0)
     currentex = whereise0[0]
@@ -384,6 +390,7 @@ def manhattan(array, origin):
             manhattan(aqueue[0, 1], aqueue[0, 2])
     else:
         visited += 1
+
 
 # Main function
 if __name__ == '__main__':
@@ -485,3 +492,39 @@ if __name__ == '__main__':
 
     print(len(searched))
     print(visited)
+
+    yourpath = '7'
+    iterator = 0
+    for root, dirs, files in os.walk(yourpath, topdown=False):
+        for name in files:
+            print(os.path.join(name))
+            # Function
+            problem_board = np.loadtxt("7/"+os.path.join(name), skiprows=1, dtype=int)
+            print(problem_board)
+
+            truePath = 'X'
+            if algo == "bfs":
+                bfs(problem_board, truePath)
+                final_path = truePath[1:]
+                reacheddepth = len(final_path)
+                queue.clear()
+
+            # Calculate path length
+            path_length = len(final_path)
+
+            # Information about operation
+            print("\n\nAlgorithm: ", algo)
+            print("Order: ", order)
+            print("Board file: ", os.path.join(name))
+
+            print("\nLength of solution: ", path_length)
+            print("Maximum depth: ", reacheddepth)
+
+            time_spent = round(((time.time() - start_time) * 1000), 3)
+            print("\nAlgorithm took: %s milliseconds" % time_spent)
+
+            iterator = iterator + 1
+
+            # End of function
+
+    print("Liczba ogarnietych tablic: " + str(iterator))
