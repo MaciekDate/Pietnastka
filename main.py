@@ -212,9 +212,18 @@ def analyze_layer_weights(layer):
     global brain
     print("Layer ", layer, " weights:")
     for neuron in range(len(brain[layer - 1])):
-        print("Neuron ", neuron, ": ")
-        for weight in range(len(brain[layer - 1][neuron].weights)):
-            print(brain[layer - 1][neuron].weights[weight])
+        if layer != 1:
+            print("Neuron ", neuron, ": ")
+            for weight in range(len(brain[layer - 1][neuron].weights)):
+                print(brain[layer - 1][neuron].weights[weight])
+        else:
+            if neuron != len(brain[layer - 1]) - 1:
+                print("Neuron ", neuron, ": ")
+                print(brain[layer - 1][neuron].weights)
+            else:
+                print("Neuron ", neuron, ": ")
+                for n in range(len(brain[0][-1].weights)):
+                    print(brain[0][-1].weights[n])
     print("*****************")
 
 def raw_layer_weights(layer):
