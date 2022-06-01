@@ -1,5 +1,6 @@
 import math
 import random
+import xlsxwriter
 
 weights_grand_index = []
 
@@ -285,6 +286,15 @@ def raw_layer_weights(layer):
                     weightsFile.write(str(brain[0][-1].weights[n]) + "\n")
 
 
+# Initializing Excel
+workbook = xlsxwriter.Workbook("Results.xlsx")
+worksheet = workbook.add_worksheet('Results')
+
+worksheet.write('A1', 'Iteration')
+worksheet.write('B1', 'Grand Sum Error')
+
+index = 2
+
 print(brain)
 brain[0] = []
 prepare_idle_layer(len(data))
@@ -295,6 +305,7 @@ include_bias()
 choice = input("Random learning *1* / Sorted learning *2*")
 print("*****START LEARNING*****")
 for i in range(10000):
+    worksheet.write('A' + str(index), i)
     grand_sum_error = 0
     for w in range(4):
         sum_error = 0
@@ -307,6 +318,8 @@ for i in range(10000):
         for t in range(4):
             sum_error += abs(data[t] - brain[len(brain) - 1][t].output)
         grand_sum_error += sum_error
+    worksheet.write('B' + str(index), grand_sum_error)
+    index = index + 1
 
     if grand_sum_error < 0.15:
         print("Finished after ", i, " epochs")
@@ -328,3 +341,4 @@ for k in range(len(brain)):
 
 weightsFile.close()
 infoFile.close()
+workbook.close()
