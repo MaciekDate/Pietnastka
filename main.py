@@ -2,6 +2,70 @@ import math
 import random
 import xlsxwriter
 
+iris_board = [[]]
+dataset = [[]]
+testset = [[]]
+
+with open("iris.data", "r") as iris_file:
+    for line in iris_file:
+        current_line = line.split(",")
+        iris_board.append(current_line)
+
+iris_file.close()
+
+del iris_board[0]
+print(iris_board)
+
+index = 0
+for x in range(3):
+    for i in range(40):
+        dataset.append(iris_board[index])
+        index = index + 1
+    for y in range(10):
+        testset.append(iris_board[index])
+        index = index + 1
+
+del testset[0]
+del dataset[0]
+
+print("dataset length", len(dataset))
+
+for deleter in range(120):
+    dataset[deleter].pop()
+
+for deleter2 in range(30):
+    testset[deleter2].pop()
+
+for counter in range(40):
+    dataset[counter].append('1')
+    dataset[counter].append('0')
+    dataset[counter].append('0')
+
+for counter2 in range(40):
+    dataset[counter2 + 40].append('0')
+    dataset[counter2 + 40].append('1')
+    dataset[counter2 + 40].append('0')
+
+for counter3 in range(40):
+    dataset[counter3 + 80].append('0')
+    dataset[counter3 + 80].append('0')
+    dataset[counter3 + 80].append('1')
+
+for testcounter in range(10):
+    testset[testcounter].append('1')
+    testset[testcounter].append('0')
+    testset[testcounter].append('0')
+
+for testcounter2 in range(10):
+    testset[testcounter2 + 10].append('0')
+    testset[testcounter2 + 10].append('1')
+    testset[testcounter2 + 10].append('0')
+
+for testcounter3 in range(10):
+    testset[testcounter3 + 20].append('0')
+    testset[testcounter3 + 20].append('0')
+    testset[testcounter3 + 20].append('1')
+
 weights_grand_index = []
 
 with open("Weights.txt", "r") as weightsFile:
@@ -18,8 +82,6 @@ bias_default = 1
 activation_default = -10
 weights_default = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 brain = [[]]
-dataset = [[1, 0, 0, 0, 1, 0, 0], [0, 1, 0, 0, 0, 1, 0], [0, 0, 1, 0, 0, 0, 1], [0, 0, 0, 1, 1, 0, 0]]
-testset = [[]]
 data = [0, 0, 0, 0]
 expected = [0, 1, 0]
 learn_rate = 0.2
@@ -306,9 +368,9 @@ def main_test():
     global confusion_matrix
     for tester in range(len(testset)):
         for dat_part in range(4):
-            data[dat_part] = testset[tester][dat_part]
+            data[dat_part] = float(testset[tester][dat_part])
         for expecte_part in range (3):
-            expected[expecte_part] = testset[tester][expecte_part+4]
+            expected[expecte_part] = float(testset[tester][expecte_part+4])
         process_forward()
         maks = 0
         for kek in range(3):
@@ -345,16 +407,16 @@ include_bias()
 choice = input("Random learning *1* / Sorted learning *2*")
 print("*****START LEARNING*****")
 
-for i in range(10000):
+for i in range(20000):
     grand_sum_error = 0
     for w in range(len(dataset)):
         sum_error = 0
         if int(choice) == 1:
             random.shuffle(dataset)
         for data_part in range(4):
-            data[data_part] = dataset[w][data_part]
+            data[data_part] = float(dataset[w][data_part])
         for expected_part in range (3):
-            expected[expected_part] = dataset[w][expected_part+4]
+            expected[expected_part] = float(dataset[w][expected_part+4])
         process_forward()
         process_backward()
         for t in range(len(expected)):
@@ -374,14 +436,18 @@ while True:
     if int(number) == 5:
         break
     for data_part in range(4):
-        data[data_part] = dataset[int(number) - 1][data_part]
+        data[data_part] = float(dataset[int(number) - 1][data_part])
     for expected_part in range(3):
-        expected[expected_part] = dataset[int(number) - 1][expected_part + 4]
+        expected[expected_part] = float(dataset[int(number) - 1][expected_part + 4])
     process_forward()
     analyze_final_output()
     print("Grand error sum for dataset: ", grand_sum_error)
     print("Totaj MSE error for dataset: ", total_error)
     infoFile.write("Grand error sum for dataset: " + str(grand_sum_error) + "\n\n")
+main_test()
+print(confusion_matrix[0])
+print(confusion_matrix[1])
+print(confusion_matrix[2])
 #for k in range(len(brain)):
     #raw_layer_weights(k+1)
 
