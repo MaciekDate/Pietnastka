@@ -191,7 +191,7 @@ def process_backward():
 
 weightsFile = open("Weights.txt", "w")
 infoFile = open("Info.txt", "w")
-infoFile.write("Informacje o przebiegu treningu")
+infoFile.write("Informacje o przebiegu treningu\n\n")
 
 
 ###########################
@@ -200,52 +200,72 @@ infoFile.write("Informacje o przebiegu treningu")
 def analyze_final_output():
     global brain
     print("Final output:")
+    infoFile.write("Final output:\n")
     for neuron in range(len(brain[-1])):
         print(brain[-1][neuron].output)
+        infoFile.write(str(brain[-1][neuron].output) + "\n")
     print("*****************")
+    infoFile.write("*****************\n")
 
 
 def analyze_layer_output(layer):
     global brain
     print("Layer ", layer, " output:")
+    infoFile.write("Layer " + str(layer) + " output:\n")
     for neuron in range(len(brain[layer - 1])):
         print(brain[layer - 1][neuron].output)
+        infoFile.write(str(brain[layer - 1][neuron].output) + "\n")
     print("*****************")
+    infoFile.write("*****************\n")
 
 
 def analyze_final_error():
     global brain
     print("Final layer error:")
+    infoFile.write("Final layer error:\n")
     for neuron in range(len(brain[-1])):
         print(brain[-1][neuron].error)
+        infoFile.write(str(brain[-1][neuron].error) + "\n")
     print("*****************")
+    infoFile.write("*****************\n")
 
 
 def analyze_layer_error(layer):
     global brain
     print("Layer ", layer, " error:")
+    infoFile.write("Layer " + str(layer) + " error:\n")
     for neuron in range(len(brain[layer - 1])):
         print(brain[layer - 1][neuron].error)
+        infoFile.write(str(brain[layer - 1][neuron].error) + "\n")
     print("*****************")
+    infoFile.write("*****************\n")
 
 
 def analyze_layer_weights(layer):
     global brain
     print("Layer ", layer, " weights:")
+    infoFile.write("Layer " + str(layer) + " weights:\n")
     for neuron in range(len(brain[layer - 1])):
         if layer != 1:
             print("Neuron ", neuron, ": ")
+            infoFile.write("Neuron " + str(neuron) + ": ")
             for weight in range(len(brain[layer - 1][neuron].weights)):
                 print(brain[layer - 1][neuron].weights[weight])
+                infoFile.write(str(brain[layer - 1][neuron].weights[weight]) + "\n")
         else:
             if neuron != len(brain[layer - 1]) - 1:
                 print("Neuron ", neuron, ": ")
+                infoFile.write("Neuron " + str(neuron) + ": ")
                 print(brain[layer - 1][neuron].weights)
+                infoFile.write(str(brain[layer - 1][neuron].weights) + "\n")
             else:
                 print("Neuron ", neuron, ": ")
+                infoFile.write("Neuron " + str(neuron) + ": ")
                 for n in range(len(brain[0][-1].weights)):
                     print(brain[0][-1].weights[n])
+                    infoFile.write(str(brain[0][-1].weights[n]) + "\n")
     print("*****************")
+    infoFile.write("*****************\n")
 
 
 def raw_layer_weights(layer):
@@ -302,6 +322,7 @@ while True:
     process_forward()
     analyze_final_output()
     print("Grand error sum for dataset: ", grand_sum_error)
+    infoFile.write("Grand error sum for dataset: " + str(grand_sum_error) + "\n\n")
 for k in range(len(brain)):
     raw_layer_weights(k+1)
 
