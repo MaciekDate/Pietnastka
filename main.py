@@ -18,7 +18,7 @@ grand_sum_error = 0
 
 class IdleNeuron:
     def __init__(self, weight, position):
-        self.weight = weight #only one weight for singular input from global data
+        self.weights = weight #only one weight for singular input from global data
         self.weights_update = 0
         self.output = 0
         self.position = position
@@ -30,7 +30,7 @@ class IdleNeuron:
         return data[self.position] #get data corresponding to own position on diagram
 
     def process(self):
-        self.output = self.weight * self.get_input() #idle neurons are linear
+        self.output = self.weights * self.get_input() #idle neurons are linear
 
     def calculate_cost(self):
         cost_delta = self.error * self.get_input()
@@ -43,7 +43,7 @@ class IdleNeuron:
         self.error = new_error
 
     def update_weights(self):
-        self.weight += self.weights_update
+        self.weights += self.weights_update
 
 class Neuron:
     def __init__(self, activation, weights, layer, biasmode = False):
@@ -208,6 +208,21 @@ def analyze_layer_error(layer):
         print(brain[layer - 1][neuron].error)
     print("*****************")
 
+def analyze_layer_weights(layer):
+    global brain
+    print("Layer ", layer, " weights:")
+    for neuron in range(len(brain[layer - 1])):
+        print("Neuron ", neuron, ": ")
+        for weight in range(len(brain[layer - 1][neuron].weights)):
+            print(brain[layer - 1][neuron].weights[weight])
+    print("*****************")
+
+def raw_layer_weights(layer):
+    global brain
+    for neuron in range(len(brain[layer - 1])):
+        for weight in range(len(brain[layer - 1][neuron].weights)):
+            print(brain[layer - 1][neuron].weights[weight])
+
 print(brain)
 brain[0] = []
 prepare_idle_layer(len(data))
@@ -238,10 +253,13 @@ print("*****LEARNING FINISHED*****")
 dataset = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]] #Change back to normal order in case choice = 1
 while True:
     number = input("Choose which dataset to use (1 - 4)")
+    if int(number) == 5:
+        break
     data = dataset[int(number) - 1]
     process_forward()
     analyze_final_output()
     print("Grand error sum for dataset: ", grand_sum_error)
+analyze_layer_weights(3)
 
 
 
