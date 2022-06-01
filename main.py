@@ -3,7 +3,7 @@ import random
 
 print("Hello world")
 
-weights_grand_index = [[]]
+weights_grand_index = []
 
 bias_default = 1
 activation_default = -10
@@ -220,8 +220,15 @@ def analyze_layer_weights(layer):
 def raw_layer_weights(layer):
     global brain
     for neuron in range(len(brain[layer - 1])):
-        for weight in range(len(brain[layer - 1][neuron].weights)):
-            print(brain[layer - 1][neuron].weights[weight])
+        if layer != 1:
+            for weight in range(len(brain[layer - 1][neuron].weights)):
+                print(brain[layer - 1][neuron].weights[weight])
+        else:
+            if neuron != len(brain[layer - 1]) - 1:
+                print(brain[layer - 1][neuron].weights)
+            else:
+                for n in range(len(brain[0][-1].weights)):
+                    print(brain[0][-1].weights[n])
 
 print(brain)
 brain[0] = []
@@ -259,7 +266,8 @@ while True:
     process_forward()
     analyze_final_output()
     print("Grand error sum for dataset: ", grand_sum_error)
-analyze_layer_weights(3)
+for k in range(len(brain)):
+    raw_layer_weights(k+1)
 
 
 
