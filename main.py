@@ -21,8 +21,8 @@ brain = [[]]
 dataset = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
 data = [0, 0, 0, 0]
 expected = [0]
-learn_rate = 0.2
-momentum = 0.9
+learn_rate = 0.9
+momentum = 0
 total_error = 0
 grand_sum_error = 0
 
@@ -148,6 +148,18 @@ def prepare_idle_layer(amount):
     for position in range(amount):
         brain[0].append(IdleNeuron((random.randint(0, 100) / 100), position))
 
+def reset_weights():
+    global brain
+    for first in range(len(brain[0]) - 1):
+        brain[0][first].weights = random.randint(0, 100) / 100
+
+    for bias in range (len(brain[0][-1].weights)):
+        brain[0][-1].weights[bias] = random.randint(0, 100) / 100
+
+    for layers in range(1, len(brain)):
+        for neurons in range(len(brain[layers])):
+            for weights in range(len(brain[layers][neurons].weights)):
+                brain[layers][neurons].weights[weights] = random.randint(0, 100) / 100
 
 ########################
 # PROCESSING FUNCTIONS #
@@ -285,7 +297,6 @@ def raw_layer_weights(layer):
                     print(brain[0][-1].weights[n])
                     weightsFile.write(str(brain[0][-1].weights[n]) + "\n")
 
-
 # Initializing Excel
 workbook = xlsxwriter.Workbook("Results.xlsx")
 worksheet = workbook.add_worksheet('Results')
@@ -304,26 +315,52 @@ print(brain)
 include_bias()
 choice = input("Random learning *1* / Sorted learning *2*")
 print("*****START LEARNING*****")
-for i in range(10000):
-    worksheet.write('A' + str(index), i)
-    grand_sum_error = 0
-    for w in range(4):
-        sum_error = 0
-        if int(choice) == 1:
-            random.shuffle(dataset)
-        data = dataset[w]
-        expected = data
-        process_forward()
-        process_backward()
-        for t in range(4):
-            sum_error += abs(data[t] - brain[len(brain) - 1][t].output)
-        grand_sum_error += sum_error
-    worksheet.write('B' + str(index), grand_sum_error)
-    index = index + 1
+for y in range(10):
+    index = 2
+    strung = ''
+    if y ==0:
+        strung = 'A'
+    if y ==1:
+        strung = 'B'
+    if y ==2:
+        strung = 'C'
+    if y ==3:
+        strung = 'D'
+    if y ==4:
+        strung = 'E'
+    if y ==5:
+        strung = 'F'
+    if y ==6:
+        strung = 'G'
+    if y ==7:
+        strung = 'H'
+    if y ==8:
+        strung = 'I'
+    if y ==9:
+        strung = 'J'
+    for i in range(10000):
+        grand_sum_error = 0
+        for w in range(4):
+            sum_error = 0
+            if int(choice) == 1:
+                random.shuffle(dataset)
+            data = dataset[w]
+            expected = data
+            process_forward()
+            process_backward()
+            for t in range(4):
+                sum_error += abs(data[t] - brain[len(brain) - 1][t].output)
+            grand_sum_error += sum_error
+        worksheet.write(strung + str(index), grand_sum_error)
+        index = index + 1
 
-    if grand_sum_error < 0.15:
-        print("Finished after ", i, " epochs")
-        break
+        if grand_sum_error < 0.15:
+            worksheet.write('K' + str(y), i)
+            print("Finished after ", i, " epochs")
+            break
+        if i == 9999:
+            worksheet.write('K' + str(y), i)
+    reset_weights()
 
 print("*****LEARNING FINISHED*****")
 dataset = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]  # Change back to normal order in case choice = 1
@@ -336,8 +373,8 @@ while True:
     analyze_final_output()
     print("Grand error sum for dataset: ", grand_sum_error)
     infoFile.write("Grand error sum for dataset: " + str(grand_sum_error) + "\n\n")
-for k in range(len(brain)):
-    raw_layer_weights(k+1)
+#for k in range(len(brain)):
+    #raw_layer_weights(k+1)
 
 weightsFile.close()
 infoFile.close()
