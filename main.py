@@ -18,13 +18,15 @@ bias_default = 1
 activation_default = -10
 weights_default = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 brain = [[]]
-dataset = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+dataset = [[1, 0, 0, 0, 1, 0, 0], [0, 1, 0, 0, 0, 1, 0], [0, 0, 1, 0, 0, 0, 1], [0, 0, 0, 1, 1, 0, 0]]
+testset = [[]]
 data = [0, 0, 0, 0]
-expected = [0]
-learn_rate = 0.9
-momentum = 0
+expected = [0, 1, 0]
+learn_rate = 0.2
+momentum = 0.7
 total_error = 0
 grand_sum_error = 0
+confusion_matrix = [[0, 0, 0], [0, 0, 0], [0, 0, 0]]
 
 
 class IdleNeuron:
@@ -135,7 +137,7 @@ def add_default_layer(amount):
 
 
 def add_last_layer():
-    add_default_layer(len(data))
+    add_default_layer(len(expected))
 
 
 def include_bias():  # use as last option!!!
@@ -297,6 +299,31 @@ def raw_layer_weights(layer):
                     print(brain[0][-1].weights[n])
                     weightsFile.write(str(brain[0][-1].weights[n]) + "\n")
 
+def main_test():
+    global testset
+    global data
+    global expected
+    global confusion_matrix
+    for tester in range(len(testset)):
+        for dat_part in range(4):
+            data[dat_part] = testset[tester][dat_part]
+        for expecte_part in range (3):
+            expected[expecte_part] = testset[tester][expecte_part+4]
+        process_forward()
+        maks = 0
+        for kek in range(3):
+            if brain[-1][kek].output > brain[-1][maks].output:
+                maks = kek
+        if tester < 10:
+            confusion_matrix[0][maks] += 1
+        elif tester < 20:
+            confusion_matrix[1][maks] += 1
+        elif tester < 30:
+            confusion_matrix[2][maks] += 1
+
+
+
+
 # Initializing Excel
 workbook = xlsxwriter.Workbook("Results.xlsx")
 worksheet = workbook.add_worksheet('Results')
@@ -309,69 +336,51 @@ index = 2
 print(brain)
 brain[0] = []
 prepare_idle_layer(len(data))
-add_default_layer(2)
+add_default_layer(3)
+add_default_layer(3)
+add_default_layer(3)
 add_last_layer()
 print(brain)
 include_bias()
 choice = input("Random learning *1* / Sorted learning *2*")
 print("*****START LEARNING*****")
-for y in range(10):
-    index = 2
-    strung = ''
-    if y ==0:
-        strung = 'A'
-    if y ==1:
-        strung = 'B'
-    if y ==2:
-        strung = 'C'
-    if y ==3:
-        strung = 'D'
-    if y ==4:
-        strung = 'E'
-    if y ==5:
-        strung = 'F'
-    if y ==6:
-        strung = 'G'
-    if y ==7:
-        strung = 'H'
-    if y ==8:
-        strung = 'I'
-    if y ==9:
-        strung = 'J'
-    for i in range(10000):
-        grand_sum_error = 0
-        for w in range(4):
-            sum_error = 0
-            if int(choice) == 1:
-                random.shuffle(dataset)
-            data = dataset[w]
-            expected = data
-            process_forward()
-            process_backward()
-            for t in range(4):
-                sum_error += abs(data[t] - brain[len(brain) - 1][t].output)
-            grand_sum_error += sum_error
-        worksheet.write(strung + str(index), grand_sum_error)
-        index = index + 1
 
-        if grand_sum_error < 0.15:
-            worksheet.write('K' + str(y), i)
-            print("Finished after ", i, " epochs")
-            break
-        if i == 9999:
-            worksheet.write('K' + str(y), i)
-    reset_weights()
+for i in range(10000):
+    grand_sum_error = 0
+    for w in range(len(dataset)):
+        sum_error = 0
+        if int(choice) == 1:
+            random.shuffle(dataset)
+        for data_part in range(4):
+            data[data_part] = dataset[w][data_part]
+        for expected_part in range (3):
+            expected[expected_part] = dataset[w][expected_part+4]
+        process_forward()
+        process_backward()
+        for t in range(len(expected)):
+            sum_error += abs(expected[t] - brain[-1][t].output)
+        grand_sum_error += sum_error
+    worksheet.write('B' + str(index), grand_sum_error)
+    index = index + 1
+
+    if grand_sum_error < 0.15 and total_error < 0.001:
+        print("Finished after ", i, " epochs")
+        break
 
 print("*****LEARNING FINISHED*****")
-dataset = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]  # Change back to normal order in case choice = 1
+dataset = [[1, 0, 0, 0, 1, 0, 0], [0, 1, 0, 0, 0, 1, 0], [0, 0, 1, 0, 0, 0, 1], [0, 0, 0, 1, 1, 0, 0]]  # Change back to normal order in case choice = 1
 while True:
     number = input("Choose which dataset to use (1 - 4)")
     if int(number) == 5:
         break
-    data = dataset[int(number) - 1]
+    for data_part in range(4):
+        data[data_part] = dataset[int(number) - 1][data_part]
+    for expected_part in range(3):
+        expected[expected_part] = dataset[int(number) - 1][expected_part + 4]
     process_forward()
     analyze_final_output()
     print("Grand error sum for dataset: ", grand_sum_error)
+    print("Totaj MSE error for dataset: ", total_error)
     infoFile.write("Grand error sum for dataset: " + str(grand_sum_error) + "\n\n")
 #for k in range(len(brain)):
     #raw_layer_weights(k+1)
