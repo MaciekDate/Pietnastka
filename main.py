@@ -3,12 +3,11 @@ import random
 
 weights_grand_index = []
 
-with open("Weights.txt", "r") as weights:
-    weights.readline()
-    for line in weights:
+with open("Weights.txt", "r") as weightsFile:
+    for line in weightsFile:
         weights_grand_index.append(float(line))
 
-weights.close()
+weightsFile.close()
 
 print("Loaded weights: ")
 for el in weights_grand_index:
@@ -190,9 +189,9 @@ def process_backward():
             brain[layer][neuron].update_weights()
 
 
-weights = open("Weights.txt", "w")
-info = open("Info.txt", "w")
-info.write("Informacje o przebiegu treningu")
+weightsFile = open("Weights.txt", "w")
+infoFile = open("Info.txt", "w")
+infoFile.write("Informacje o przebiegu treningu")
 
 
 ###########################
@@ -255,15 +254,15 @@ def raw_layer_weights(layer):
         if layer != 1:
             for weight in range(len(brain[layer - 1][neuron].weights)):
                 print(brain[layer - 1][neuron].weights[weight])
-                weights.write(str(brain[layer - 1][neuron].weights[weight]) + "\n")
+                weightsFile.write(str(brain[layer - 1][neuron].weights[weight]) + "\n")
         else:
             if neuron != len(brain[layer - 1]) - 1:
                 print(brain[layer - 1][neuron].weights)
-                weights.write(str(brain[layer - 1][neuron].weights) + "\n")
+                weightsFile.write(str(brain[layer - 1][neuron].weights) + "\n")
             else:
                 for n in range(len(brain[0][-1].weights)):
                     print(brain[0][-1].weights[n])
-                    weights.write(str(brain[0][-1].weights[n]) + "\n")
+                    weightsFile.write(str(brain[0][-1].weights[n]) + "\n")
 
 
 print(brain)
@@ -306,5 +305,5 @@ while True:
 for k in range(len(brain)):
     raw_layer_weights(k+1)
 
-weights.close()
-info.close()
+weightsFile.close()
+infoFile.close()
