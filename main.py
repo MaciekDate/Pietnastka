@@ -10,7 +10,8 @@ activation_default = -10
 weights_default = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 brain = [[]]
 dataset = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
-data = [1, 0, 0, 0]
+data = [0, 0, 0, 0]
+expected = [0]
 learn_rate = 0.2
 momentum = 0.9
 total_error = 0
@@ -156,7 +157,7 @@ def process_backward():
     global momentum
     total_error = 0
     for neuron in range(len(brain[-1])):  # calculate error for last layer
-        error = data[neuron] - brain[-1][neuron].output  # average squared error
+        error = expected[neuron] - brain[-1][neuron].output  # average squared error
         # print("tu jest error: ", error)
         brain[-1][neuron].set_error(error)
         total_error += error ** 2  # MSE for one error in sum
@@ -264,6 +265,7 @@ for i in range(10000):
         if int(choice) == 1:
             random.shuffle(dataset)
         data = dataset[w]
+        expected = data
         process_forward()
         process_backward()
         for t in range(4):
