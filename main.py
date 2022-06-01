@@ -3,19 +3,23 @@ import random
 
 print("Hello world")
 
+weights_grand_index = [[]]
+
 bias_default = 1
 activation_default = -10
 weights_default = (1, 1, 1, 1, 1, 1, 1, 1, 1, 1)
 brain = [[]]
-data = (1, 0, 0, 0)
-learn_rate = 1
-momentum = 0
+dataset = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]
+data = [1, 0, 0, 0]
+learn_rate = 0.2
+momentum = 0.9
 total_error = 0
+grand_sum_error = 0
 
 class IdleNeuron:
     def __init__(self, weight, position):
         self.weight = weight #only one weight for singular input from global data
-        self.weights_update = weight
+        self.weights_update = 0
         self.output = 0
         self.position = position
         self.error = 0
@@ -45,7 +49,9 @@ class Neuron:
     def __init__(self, activation, weights, layer, biasmode = False):
         self.activation = activation
         self.weights = weights
-        self.weights_update = weights
+        self.weights_update = [0]
+        for o in range(len(weights)):
+            self.weights_update.append(0)
         self.layer = layer
         self.biasmode = biasmode
         self.active = False
@@ -154,22 +160,22 @@ def process_backward():
         total_error += error ** 2 #MSE for one error in sum
 
     for layer in range(len(brain), 1, -1):#for each layer
-        print("layer number: ", layer)
+        #print("layer number: ", layer)
         for prev_neuron in range(len(brain[layer - 2])):#for each previous neuron
             local_error = 0
             prev_output = brain[layer - 2][prev_neuron].output
-            print("prev_output: ", prev_output)
+            #print("prev_output: ", prev_output)
             for curr_neuron in range(len(brain[layer - 1])):#each current neuron
 
-                update_value = brain[layer - 1][curr_neuron].calculate_cost() * prev_output #* learn_rate + (momentum * 3) #ADD MOMENTUM FORMULA
+                update_value = brain[layer - 1][curr_neuron].calculate_cost() * prev_output * learn_rate + (momentum * brain[layer - 1][curr_neuron].weights_update[prev_neuron]) #ADD MOMENTUM FORMULA
                 local_error += brain[layer - 1][curr_neuron].calculate_cost() * brain[layer - 1][curr_neuron].weights[prev_neuron]
                 brain[layer - 1][curr_neuron].set_weight_delta(update_value, prev_neuron)
 
             brain[layer - 2][prev_neuron].set_error(local_error)
             #local_error = 1 * brain[layer].weights[1] #wtf
- #   for layer in range(len(brain)):
-  #      for neuron in range(len(brain[layer])):
-   #         brain[layer][neuron].update_weights()
+    for layer in range(len(brain)):
+        for neuron in range(len(brain[layer])):
+            brain[layer][neuron].update_weights()
 
 #########################
 #DATA ANALYSIS FUNCTIONS#
@@ -205,25 +211,38 @@ def analyze_layer_error(layer):
 print(brain)
 brain[0] = []
 prepare_idle_layer(len(data))
-add_default_layer(4)
-add_default_layer(3)
 add_default_layer(2)
-add_default_layer(5)
 add_last_layer()
 print(brain)
-#include_bias()
-for i in range(len(brain)):
-    analyze_layer_error(i+1)
-process_forward()
-analyze_final_output()
-process_backward()
-for i in range(10):
+include_bias()
+choice = input("Random learning *1* / Sorted learning *2*")
+print("*****START LEARNING*****")
+for i in range(10000):
+    grand_sum_error = 0
+    for w in range(4):
+        sum_error = 0
+        if int(choice) == 1:
+            random.shuffle(dataset)
+        data = dataset[w]
+        process_forward()
+        process_backward()
+        for t in range(4):
+            sum_error += abs(data[t] - brain[len(brain) - 1][t].output)
+        grand_sum_error += sum_error
+
+    if grand_sum_error < 0.15:
+        print("Finished after ", i, " epochs")
+        break
+
+print("*****LEARNING FINISHED*****")
+dataset = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]] #Change back to normal order in case choice = 1
+while True:
+    number = input("Choose which dataset to use (1 - 4)")
+    data = dataset[int(number) - 1]
     process_forward()
-    process_backward()
-for i in range(len(brain)):
-    analyze_layer_error(i+1)
-analyze_layer_output(6)
-print(total_error)
+    analyze_final_output()
+    print("Grand error sum for dataset: ", grand_sum_error)
+
 
 
 
