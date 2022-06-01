@@ -16,34 +16,32 @@ momentum = 0.9
 total_error = 0
 grand_sum_error = 0
 
+
 class IdleNeuron:
     def __init__(self, weight, position):
-        self.weights = weight #only one weight for singular input from global data
+        self.weights = weight  # only one weight for singular input from global data
         self.weights_update = 0
         self.output = 0
         self.position = position
         self.error = 0
 
-
     def get_input(self):
         global data
-        return data[self.position] #get data corresponding to own position on diagram
+        return data[self.position]  # get data corresponding to own position on diagram
 
     def process(self):
-        self.output = self.weights * self.get_input() #idle neurons are linear
+        self.output = self.weights * self.get_input()  # idle neurons are linear
 
     def calculate_cost(self):
         cost_delta = self.error * self.get_input()
         return cost_delta
-
-    def learn(self):
-        print("smart stuff here")
 
     def set_error(self, new_error):
         self.error = new_error
 
     def update_weights(self):
         self.weights += self.weights_update
+
 
 class Neuron:
     def __init__(self, activation, weights, layer, biasmode = False):
@@ -61,11 +59,11 @@ class Neuron:
     def gather_input(self):
         global brain
         result = 0
-        while len(brain[self.layer-2]) > len(self.weights): #safe measure if previous layers are extended (eg. bias)
-            self.weights.append((random.randint(0,100) / 100))
+        while len(brain[self.layer-2]) > len(self.weights):  # safe measure if previous layers are extended (eg. bias)
+            self.weights.append((random.randint(0, 100) / 100))
 
-        for z in range(len(brain[self.layer-2])): #for previous layer + indexing
-            result = result + self.weights[z] * brain[self.layer - 2][z].output #add Neuron output here /// -2 because indexing AND previous layer
+        for z in range(len(brain[self.layer-2])):  # for previous layer + indexing
+            result = result + self.weights[z] * brain[self.layer - 2][z].output  # add Neuron output here /// -2 because indexing AND previous layer
         if result > self.activation:
             self.active = True
             return result
@@ -87,7 +85,6 @@ class Neuron:
                 self.output = 0
                 return self.output
 
-
     def set_error(self, new_error):
         self.error = new_error
 
@@ -104,10 +101,10 @@ class Neuron:
             self.weights[x] += self.weights_update[x]
 
 
-#############################
-#NETWORK STRUCTURE FUNCTIONS#
-#############################
-def add_neuron_to_layer(layer, biasmode = True, activation = activation_default):
+###############################
+# NETWORK STRUCTURE FUNCTIONS #
+###############################
+def add_neuron_to_layer(layer, biasmode=True, activation=activation_default):
     global brain
     global data
     weight = []
@@ -119,33 +116,38 @@ def add_neuron_to_layer(layer, biasmode = True, activation = activation_default)
             weight.append((random.randint(0, 100) / 100))
     brain[layer-1].append(Neuron(activation, weight, layer, biasmode))
 
+
 def add_default_layer(amount):
     global brain
     brain.append([])
     for u in range(amount):
         add_neuron_to_layer(len(brain), False)
 
+
 def add_last_layer():
     add_default_layer(len(data))
 
-def include_bias(): #use as last option!!!
+
+def include_bias():  # use as last option!!!
     for q in range(len(brain) - 1):
         add_neuron_to_layer(q+1)
+
 
 def prepare_idle_layer(amount):
     global brain
     for position in range(amount):
-        brain[0].append(IdleNeuron((random.randint(0,100) / 100), position))
+        brain[0].append(IdleNeuron((random.randint(0, 100) / 100), position))
 
 
-######################
-#PROCESSING FUNCTIONS#
-######################
+########################
+# PROCESSING FUNCTIONS #
+########################
 def process_forward():
     global brain
     for layer in range(len(brain)):
         for neuron in range(len(brain[layer])):
             brain[layer][neuron].process()
+
 
 def process_backward():
     global brain
@@ -153,39 +155,41 @@ def process_backward():
     global learn_rate
     global momentum
     total_error = 0
-    for neuron in range(len(brain[-1])): #calculate error for last layer
-        error = data[neuron] - brain[-1][neuron].output  #average squared error
-        #print("tu jest error: ", error)
+    for neuron in range(len(brain[-1])):  # calculate error for last layer
+        error = data[neuron] - brain[-1][neuron].output  # average squared error
+        # print("tu jest error: ", error)
         brain[-1][neuron].set_error(error)
-        total_error += error ** 2 #MSE for one error in sum
+        total_error += error ** 2  # MSE for one error in sum
 
-    for layer in range(len(brain), 1, -1):#for each layer
-        #print("layer number: ", layer)
-        for prev_neuron in range(len(brain[layer - 2])):#for each previous neuron
+    for layer in range(len(brain), 1, -1):  # for each layer
+        # print("layer number: ", layer)
+        for prev_neuron in range(len(brain[layer - 2])):  # for each previous neuron
             local_error = 0
             prev_output = brain[layer - 2][prev_neuron].output
-            #print("prev_output: ", prev_output)
-            for curr_neuron in range(len(brain[layer - 1])):#each current neuron
+            # print("prev_output: ", prev_output)
+            for curr_neuron in range(len(brain[layer - 1])):  # each current neuron
 
-                update_value = brain[layer - 1][curr_neuron].calculate_cost() * prev_output * learn_rate + (momentum * brain[layer - 1][curr_neuron].weights_update[prev_neuron]) #ADD MOMENTUM FORMULA
+                update_value = brain[layer - 1][curr_neuron].calculate_cost() * prev_output * learn_rate + (momentum * brain[layer - 1][curr_neuron].weights_update[prev_neuron]) # ADD MOMENTUM FORMULA
                 local_error += brain[layer - 1][curr_neuron].calculate_cost() * brain[layer - 1][curr_neuron].weights[prev_neuron]
                 brain[layer - 1][curr_neuron].set_weight_delta(update_value, prev_neuron)
 
             brain[layer - 2][prev_neuron].set_error(local_error)
-            #local_error = 1 * brain[layer].weights[1] #wtf
+            # local_error = 1 * brain[layer].weights[1] #wtf
     for layer in range(len(brain)):
         for neuron in range(len(brain[layer])):
             brain[layer][neuron].update_weights()
 
-#########################
-#DATA ANALYSIS FUNCTIONS#
-#########################
+
+###########################
+# DATA ANALYSIS FUNCTIONS #
+###########################
 def analyze_final_output():
     global brain
     print("Final output:")
     for neuron in range(len(brain[-1])):
         print(brain[-1][neuron].output)
     print("*****************")
+
 
 def analyze_layer_output(layer):
     global brain
@@ -194,6 +198,7 @@ def analyze_layer_output(layer):
         print(brain[layer - 1][neuron].output)
     print("*****************")
 
+
 def analyze_final_error():
     global brain
     print("Final layer error:")
@@ -201,12 +206,14 @@ def analyze_final_error():
         print(brain[-1][neuron].error)
     print("*****************")
 
+
 def analyze_layer_error(layer):
     global brain
     print("Layer ", layer, " error:")
     for neuron in range(len(brain[layer - 1])):
         print(brain[layer - 1][neuron].error)
     print("*****************")
+
 
 def analyze_layer_weights(layer):
     global brain
@@ -226,6 +233,7 @@ def analyze_layer_weights(layer):
                     print(brain[0][-1].weights[n])
     print("*****************")
 
+
 def raw_layer_weights(layer):
     global brain
     for neuron in range(len(brain[layer - 1])):
@@ -238,6 +246,7 @@ def raw_layer_weights(layer):
             else:
                 for n in range(len(brain[0][-1].weights)):
                     print(brain[0][-1].weights[n])
+
 
 print(brain)
 brain[0] = []
@@ -266,7 +275,7 @@ for i in range(10000):
         break
 
 print("*****LEARNING FINISHED*****")
-dataset = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]] #Change back to normal order in case choice = 1
+dataset = [[1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 1, 0], [0, 0, 0, 1]]  # Change back to normal order in case choice = 1
 while True:
     number = input("Choose which dataset to use (1 - 4)")
     if int(number) == 5:
@@ -277,8 +286,4 @@ while True:
     print("Grand error sum for dataset: ", grand_sum_error)
 for k in range(len(brain)):
     raw_layer_weights(k+1)
-
-
-
-
 
